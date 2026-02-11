@@ -95,6 +95,15 @@ Photo seed derivation uses this order:
 
 If OCR fails on large images, crop the numeric region tighter for better accuracy. The app will still return a seed via fallback so training is never blocked.
 
+## OCR tuning benchmark
+
+Use `/tune` to batch-run OCR against images in `public/tune` and get exact-match accuracy.
+
+- File naming for expected values: put the expected digits after the final hyphen.
+- Example: `Capture-2026-02-11-221241-2025.png`
+- Supported expected length: 2-8 digits.
+- Tune page reports per-file mismatches and allows CSV export.
+
 ## Scripts
 
 - `npm run dev`: start development server

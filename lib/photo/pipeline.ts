@@ -85,9 +85,7 @@ async function runPipeline(file: File, options: PhotoPipelineOptions): Promise<P
   const ocrCandidates = ocrResult.candidates;
 
   const bestOcr = pickBestOcrCandidate(ocrCandidates);
-  // 2-digit OCR hits are frequently false-positives (e.g. "1,2" -> "12") from surrounding text.
-  // Prefer palette fallback unless OCR finds a more meaningful group.
-  if (bestOcr && bestOcr.digits.length >= 3) {
+  if (bestOcr && isUsableOcrCandidate(bestOcr)) {
     const paletteSwatches = await palettePromise;
     return {
       seed: bestOcr.digits,
@@ -161,4 +159,15 @@ function buildPaletteMessage(seed: string, diagnostics: string[]): string {
     return `Using palette-derived seed ${seed}. ${firstFailure}`;
   }
   return `Using palette-derived seed ${seed}.`;
+}
+
+function isUsableOcrCandidate(candidate: { digits: string; confidence: number }): boolean {
+  if (candidate.digits.length >= 3) {
+    return true;
+  }
+  // Allow 2-digit outputs when OCR is confident; this helps true handwritten 2-digit samples.
+  if (candidate.digits.length === 2 && candidate.confidence >= 0.82) {
+    return true;
+  }
+  return false;
 }

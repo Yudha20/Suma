@@ -14,10 +14,8 @@ export function PhotoExplainDrawer({
   swatches: Swatch[];
 }) {
   return (
-    <details className="rounded-lg border border-consoleEdge bg-black/40 p-4">
-      <summary className="cursor-pointer text-xs uppercase tracking-[0.2em] text-slate-300">
-        How we got this number
-      </summary>
+    <section className="rounded-lg border border-consoleEdge bg-black/40 p-4">
+      <p className="text-xs uppercase tracking-[0.2em] text-slate-300">How we got this number</p>
       <div className="mt-3 flex flex-col gap-3 text-sm text-slate-300">
         <p>
           Status: <span className="font-medium text-slate-100">{status}</span>
@@ -63,6 +61,6 @@ export function PhotoExplainDrawer({
           </div>
         ))}
       </div>
-    </details>
+    </section>
   );
 }

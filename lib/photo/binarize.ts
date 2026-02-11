@@ -22,7 +22,13 @@ export function binarizeForOcr(imageData: ImageData, brightnessTweak: number): I
     next.data[i + 3] = a;
   }
 
-  return next;
+  const darkRatio = estimateDarkPixelRatio(next);
+  if (darkRatio <= 0.001 || darkRatio >= 0.2) {
+    return next;
+  }
+
+  // Thin handwritten strokes can break after thresholding; lightly thicken dark pixels.
+  return dilateDarkPixels(next);
 }
 
 function clampThreshold(value: number): number {
@@ -87,4 +93,62 @@ function otsuThreshold(imageData: ImageData): number {
   }
 
   return threshold;
+}
+
+function estimateDarkPixelRatio(imageData: ImageData): number {
+  let opaque = 0;
+  let dark = 0;
+
+  for (let i = 0; i < imageData.data.length; i += 4) {
+    const alpha = imageData.data[i + 3];
+    if (alpha < 32) {
+      continue;
+    }
+    opaque += 1;
+    if (imageData.data[i] < 64) {
+      dark += 1;
+    }
+  }
+
+  if (opaque === 0) {
+    return 0;
+  }
+  return dark / opaque;
+}
+
+function dilateDarkPixels(imageData: ImageData): ImageData {
+  const { width, height } = imageData;
+  const source = imageData.data;
+  const out = new ImageData(new Uint8ClampedArray(source), width, height);
+  const target = out.data;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const idx = (y * width + x) * 4;
+      if (source[idx] > 64) {
+        continue;
+      }
+
+      for (let dy = -1; dy <= 1; dy += 1) {
+        const ny = y + dy;
+        if (ny < 0 || ny >= height) {
+          continue;
+        }
+
+        for (let dx = -1; dx <= 1; dx += 1) {
+          const nx = x + dx;
+          if (nx < 0 || nx >= width) {
+            continue;
+          }
+          const nidx = (ny * width + nx) * 4;
+          target[nidx] = 0;
+          target[nidx + 1] = 0;
+          target[nidx + 2] = 0;
+          target[nidx + 3] = Math.max(target[nidx + 3], source[idx + 3]);
+        }
+      }
+    }
+  }
+
+  return out;
 }

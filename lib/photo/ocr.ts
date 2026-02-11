@@ -36,6 +36,23 @@ const TESSERACT_CDNS = [
   'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js'
 ];
 
+const LOOKALIKE_DIGIT_MAP: Record<string, string> = {
+  O: '0',
+  o: '0',
+  Q: '0',
+  D: '0',
+  I: '1',
+  l: '1',
+  '|': '1',
+  '!': '1',
+  Z: '2',
+  z: '2',
+  S: '5',
+  s: '5',
+  G: '6',
+  B: '8'
+};
+
 export type OcrRunResult = {
   candidates: OcrCandidate[];
   diagnostics: string[];
@@ -82,7 +99,7 @@ export async function extractOcrCandidatesDetailed(
     }
   }
 
-  if (candidates.size === 0) {
+  if (candidates.size === 0 || !hasStrongCandidate(candidates)) {
     const gridCandidates = await extractWithTextDetectorGrid(canvas, timeoutMs).catch((error: unknown) => {
       diagnostics.push(formatError('TextDetector grid pass', error));
       return [];
@@ -101,7 +118,7 @@ export async function extractOcrCandidatesDetailed(
     }
   }
 
-  if (candidates.size === 0) {
+  if (candidates.size === 0 || !hasHighQualityCandidate(candidates)) {
     const tesseractCandidates = await extractWithTesseract(canvas, Math.max(1200, timeoutMs)).catch((error: unknown) => {
       diagnostics.push(formatError('Tesseract', error));
       return [];
@@ -118,6 +135,8 @@ export async function extractOcrCandidatesDetailed(
         candidates.set(candidate.digits, candidate);
       }
     }
+  } else {
+    diagnostics.push('Skipped Tesseract because TextDetector produced a high-quality candidate.');
   }
 
   const sorted = Array.from(candidates.values())
@@ -160,15 +179,15 @@ export function pickBestOcrCandidate(candidates: OcrCandidate[]): OcrCandidate |
 
 export function extractDigitsFromText(text: string): string[] {
   const outputs = new Set<string>();
-  const normalizedText = text.replace(/[Oo]/g, '0').replace(/[Il]/g, '1');
-  const compactMatches = text.match(/\d{2,8}/g) ?? [];
+  const normalizedText = normalizeLikelyDigitRuns(text);
+  const compactMatches = text.match(/(?<!\d)\d{2,8}(?!\d)/g) ?? [];
   for (const match of compactMatches) {
     if (/^\d{2,8}$/.test(match)) {
       outputs.add(match);
     }
   }
 
-  const noisyMatches = normalizedText.match(/\d[\d\s\-.,/|]{0,120}\d/g) ?? [];
+  const noisyMatches = normalizedText.match(/(?<!\d)\d(?:[\s\-.,/|]{0,3}\d){1,7}(?!\d)/g) ?? [];
   for (const match of noisyMatches) {
     const normalized = match.replace(/\D/g, '');
     if (/^\d{2,8}$/.test(normalized)) {
@@ -184,6 +203,32 @@ export function extractDigitsFromText(text: string): string[] {
   }
 
   return Array.from(outputs);
+}
+
+function normalizeLikelyDigitRuns(text: string): string {
+  return text.replace(/[A-Za-z0-9|!]+/g, (token) => {
+    if (!isLikelyDigitToken(token)) {
+      return token;
+    }
+
+    let mapped = '';
+    for (const char of token) {
+      mapped += LOOKALIKE_DIGIT_MAP[char] ?? char;
+    }
+    return mapped;
+  });
+}
+
+function isLikelyDigitToken(token: string): boolean {
+  if (!/\d/.test(token)) {
+    return false;
+  }
+  for (const char of token) {
+    if (!/\d/.test(char) && !LOOKALIKE_DIGIT_MAP[char]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 type DigitToken = {
@@ -234,18 +279,11 @@ function mergeNeighborDigitTokens(text: string, tokens: DigitToken[]): string[] 
 function addCandidateSlices(output: Set<string>, digits: string): void {
   if (digits.length >= 2 && digits.length <= 8) {
     output.add(digits);
-    return;
-  }
-
-  if (digits.length > 8) {
-    for (let start = 0; start <= digits.length - 8; start += 1) {
-      output.add(digits.slice(start, start + 8));
-    }
   }
 }
 
 function isMergeableSeparator(separator: string): boolean {
-  if (separator.length > 8) {
+  if (separator.length > 3) {
     return false;
   }
 
@@ -258,8 +296,8 @@ function isMergeableSeparator(separator: string): boolean {
 
 function scoreCandidate(candidate: OcrCandidate): number {
   const lengthScoreByDigits: Record<number, number> = {
-    2: 0.1,
-    3: 0.45,
+    2: 0.28,
+    3: 0.56,
     4: 0.72,
     5: 0.92,
     6: 1,
@@ -282,22 +320,31 @@ async function extractWithTextDetector(
     return [];
   }
 
-  const detector = new TextDetectorCtor();
-  const blocks = await withTimeout(detector.detect(canvas), timeoutMs, 'OCR timed out');
+  const variants = buildTextDetectorVariants(canvas);
+  const perVariantTimeoutMs = Math.max(220, Math.floor(timeoutMs / Math.max(1, variants.length)));
   const candidates = new Map<string, OcrCandidate>();
 
-  for (const block of blocks) {
-    const raw = block.rawValue ?? '';
-    const digits = extractDigitsFromText(raw);
-    for (const value of digits) {
-      const confidence = Math.min(0.99, 0.45 + value.length / 12);
-      const previous = candidates.get(value);
-      if (!previous || confidence > previous.confidence) {
-        candidates.set(value, {
-          digits: value,
-          confidence,
-          source: 'text-detector'
-        });
+  for (const variant of variants) {
+    const detector = new TextDetectorCtor();
+    const blocks = await withTimeout(
+      detector.detect(variant.canvas),
+      perVariantTimeoutMs,
+      `OCR timed out (${variant.label})`
+    ).catch(() => []);
+
+    for (const block of blocks) {
+      const raw = block.rawValue ?? '';
+      const digits = extractDigitsFromText(raw);
+      for (const value of digits) {
+        const confidence = Math.min(0.99, 0.45 + value.length / 12 + variant.confidenceAdjust);
+        const previous = candidates.get(value);
+        if (!previous || confidence > previous.confidence) {
+          candidates.set(value, {
+            digits: value,
+            confidence,
+            source: 'text-detector'
+          });
+        }
       }
     }
   }
@@ -347,24 +394,344 @@ async function extractWithTesseract(
   timeoutMs: number
 ): Promise<OcrCandidate[]> {
   const tesseract = await loadTesseract();
-  const result = await withTimeout(
-    tesseract.recognize(canvas, 'eng', {
-      tessedit_char_whitelist: '0123456789',
-      preserve_interword_spaces: '1'
-    }),
-    timeoutMs,
-    'Tesseract OCR timed out'
-  );
+  const variants = buildTesseractVariants(canvas, timeoutMs);
+  const perVariantTimeoutMs = Math.max(500, Math.floor(timeoutMs / Math.max(1, variants.length)));
+  const merged = new Map<string, OcrCandidate>();
 
-  const text = result.data?.text ?? '';
-  const baseConfidence = Math.max(0.1, Math.min(0.99, (result.data?.confidence ?? 0) / 100));
-  const digits = extractDigitsFromText(text);
+  for (const variant of variants) {
+    const result = await withTimeout(
+      tesseract.recognize(variant.canvas, 'eng', {
+        tessedit_char_whitelist: '0123456789',
+        preserve_interword_spaces: '1',
+        tessedit_pageseg_mode: '6'
+      }),
+      perVariantTimeoutMs,
+      `Tesseract OCR timed out (${variant.label})`
+    ).catch(() => null);
 
-  return digits.map((value) => ({
-    digits: value,
-    confidence: Math.min(0.99, baseConfidence + value.length / 30),
-    source: 'tesseract'
-  }));
+    if (!result) {
+      continue;
+    }
+
+    const text = result.data?.text ?? '';
+    const baseConfidence = Math.max(0.1, Math.min(0.99, (result.data?.confidence ?? 0) / 100));
+    const digits = extractDigitsFromText(text);
+
+    for (const value of digits) {
+      const candidate: OcrCandidate = {
+        digits: value,
+        confidence: Math.min(0.99, baseConfidence + value.length / 30 + variant.confidenceAdjust),
+        source: 'tesseract'
+      };
+      const previous = merged.get(value);
+      if (!previous || candidate.confidence > previous.confidence) {
+        merged.set(value, candidate);
+      }
+    }
+  }
+
+  return Array.from(merged.values());
+}
+
+type TesseractVariant = {
+  label: string;
+  canvas: HTMLCanvasElement;
+  confidenceAdjust: number;
+};
+
+function buildTesseractVariants(canvas: HTMLCanvasElement, timeoutMs: number): TesseractVariant[] {
+  const variants: TesseractVariant[] = [{ label: 'base', canvas, confidenceAdjust: 0 }];
+  const trimmedBottom = trimLikelyBottomBand(canvas);
+  if (trimmedBottom !== canvas) {
+    variants.push({
+      label: 'trimmed-bottom',
+      canvas: trimmedBottom,
+      confidenceAdjust: 0.06
+    });
+  }
+
+  const primaryBase = trimmedBottom !== canvas ? trimmedBottom : canvas;
+  const denseCrop = cropDenseInkRegion(primaryBase);
+  if (denseCrop !== primaryBase) {
+    variants.push({
+      label: 'dense-ink-crop',
+      canvas: denseCrop,
+      confidenceAdjust: 0.08
+    });
+  }
+
+  const primary = denseCrop !== primaryBase ? denseCrop : primaryBase;
+  const upscaled = timeoutMs >= 1800 ? scaleCanvas(primary, 2, 1800) : null;
+
+  if (upscaled) {
+    variants.push({
+      label: 'upscaled',
+      canvas: upscaled,
+      confidenceAdjust: 0.03
+    });
+  }
+
+  if (upscaled && timeoutMs >= 2600) {
+    variants.push({
+      label: 'inverted-upscaled',
+      canvas: invertCanvas(upscaled),
+      confidenceAdjust: 0.01
+    });
+  }
+
+  return variants;
+}
+
+type TextDetectorVariant = {
+  label: string;
+  canvas: HTMLCanvasElement;
+  confidenceAdjust: number;
+};
+
+function buildTextDetectorVariants(canvas: HTMLCanvasElement): TextDetectorVariant[] {
+  const variants: TextDetectorVariant[] = [{ label: 'base', canvas, confidenceAdjust: 0 }];
+  const trimmedBottom = trimLikelyBottomBand(canvas);
+  if (trimmedBottom !== canvas) {
+    variants.push({
+      label: 'trimmed-bottom',
+      canvas: trimmedBottom,
+      confidenceAdjust: 0.05
+    });
+  }
+  const denseCrop = cropDenseInkRegion(trimmedBottom !== canvas ? trimmedBottom : canvas);
+  if (denseCrop !== canvas && denseCrop !== trimmedBottom) {
+    variants.push({
+      label: 'dense-ink-crop',
+      canvas: denseCrop,
+      confidenceAdjust: 0.07
+    });
+  }
+  const centered = cropCenter(canvas, 0.86, 0.86);
+  if (centered !== canvas) {
+    variants.push({
+      label: 'center-crop',
+      canvas: centered,
+      confidenceAdjust: 0.03
+    });
+  }
+  return variants;
+}
+
+function scaleCanvas(source: HTMLCanvasElement, factor: number, maxDimension: number): HTMLCanvasElement {
+  if (factor <= 1) {
+    return source;
+  }
+
+  const width = source.width;
+  const height = source.height;
+  const scale = Math.min(factor, maxDimension / Math.max(1, Math.max(width, height)));
+  if (!Number.isFinite(scale) || scale <= 1) {
+    return source;
+  }
+
+  const scaled = document.createElement('canvas');
+  scaled.width = Math.max(1, Math.round(width * scale));
+  scaled.height = Math.max(1, Math.round(height * scale));
+  const ctx = scaled.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    return source;
+  }
+  ctx.imageSmoothingEnabled = false;
+  ctx.drawImage(source, 0, 0, width, height, 0, 0, scaled.width, scaled.height);
+  return scaled;
+}
+
+function invertCanvas(source: HTMLCanvasElement): HTMLCanvasElement {
+  const copy = document.createElement('canvas');
+  copy.width = source.width;
+  copy.height = source.height;
+  const ctx = copy.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    return source;
+  }
+
+  ctx.drawImage(source, 0, 0);
+  const imageData = ctx.getImageData(0, 0, copy.width, copy.height);
+  const data = imageData.data;
+
+  for (let i = 0; i < data.length; i += 4) {
+    data[i] = 255 - data[i];
+    data[i + 1] = 255 - data[i + 1];
+    data[i + 2] = 255 - data[i + 2];
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+  return copy;
+}
+
+function trimLikelyBottomBand(source: HTMLCanvasElement): HTMLCanvasElement {
+  const ctx = source.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    return source;
+  }
+
+  const width = source.width;
+  const height = source.height;
+  if (width < 8 || height < 8) {
+    return source;
+  }
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  let bandHeight = 0;
+  for (let y = height - 1; y >= 0; y -= 1) {
+    let dark = 0;
+    const offset = y * width * 4;
+    for (let x = 0; x < width; x += 1) {
+      const idx = offset + x * 4;
+      if (data[idx] < 64) {
+        dark += 1;
+      }
+    }
+    const darkRatio = dark / width;
+    if (darkRatio >= 0.75) {
+      bandHeight += 1;
+      continue;
+    }
+    if (bandHeight > 0) {
+      break;
+    }
+  }
+
+  const minBand = Math.max(6, Math.floor(height * 0.03));
+  const maxBand = Math.max(minBand, Math.floor(height * 0.28));
+  if (bandHeight < minBand || bandHeight > maxBand) {
+    return source;
+  }
+
+  return cropCanvas(source, 0, 0, width, height - bandHeight);
+}
+
+function cropDenseInkRegion(source: HTMLCanvasElement): HTMLCanvasElement {
+  const ctx = source.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    return source;
+  }
+
+  const width = source.width;
+  const height = source.height;
+  if (width < 24 || height < 24) {
+    return source;
+  }
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const data = imageData.data;
+  const rowCounts = new Array<number>(height).fill(0);
+  const colCounts = new Array<number>(width).fill(0);
+
+  for (let y = 0; y < height; y += 1) {
+    const rowOffset = y * width * 4;
+    for (let x = 0; x < width; x += 1) {
+      const idx = rowOffset + x * 4;
+      if (data[idx] < 64) {
+        rowCounts[y] += 1;
+        colCounts[x] += 1;
+      }
+    }
+  }
+
+  const rowThreshold = Math.max(4, Math.floor(width * 0.012));
+  const colThreshold = Math.max(4, Math.floor(height * 0.012));
+  const yBand = findDominantBand(rowCounts, rowThreshold);
+  const xBand = findDominantBand(colCounts, colThreshold);
+
+  if (!yBand || !xBand) {
+    return source;
+  }
+
+  const bandWidth = xBand.end - xBand.start + 1;
+  const bandHeight = yBand.end - yBand.start + 1;
+  if (bandWidth < Math.floor(width * 0.2) || bandHeight < Math.floor(height * 0.14)) {
+    return source;
+  }
+
+  const padX = Math.max(6, Math.floor(bandWidth * 0.08));
+  const padY = Math.max(6, Math.floor(bandHeight * 0.1));
+  const x = Math.max(0, xBand.start - padX);
+  const y = Math.max(0, yBand.start - padY);
+  const w = Math.min(width - x, bandWidth + padX * 2);
+  const h = Math.min(height - y, bandHeight + padY * 2);
+
+  return cropCanvas(source, x, y, w, h);
+}
+
+function findDominantBand(values: number[], threshold: number): { start: number; end: number } | null {
+  let bestStart = -1;
+  let bestEnd = -1;
+  let bestScore = 0;
+
+  let start = -1;
+  let score = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    if (values[i] >= threshold) {
+      if (start < 0) {
+        start = i;
+        score = 0;
+      }
+      score += values[i];
+      continue;
+    }
+
+    if (start >= 0) {
+      if (score > bestScore) {
+        bestScore = score;
+        bestStart = start;
+        bestEnd = i - 1;
+      }
+      start = -1;
+      score = 0;
+    }
+  }
+
+  if (start >= 0 && score > bestScore) {
+    bestScore = score;
+    bestStart = start;
+    bestEnd = values.length - 1;
+  }
+
+  if (bestStart < 0 || bestEnd < bestStart) {
+    return null;
+  }
+  return { start: bestStart, end: bestEnd };
+}
+
+function cropCenter(source: HTMLCanvasElement, widthRatio: number, heightRatio: number): HTMLCanvasElement {
+  const width = source.width;
+  const height = source.height;
+  if (width < 16 || height < 16) {
+    return source;
+  }
+  const targetWidth = Math.max(8, Math.floor(width * widthRatio));
+  const targetHeight = Math.max(8, Math.floor(height * heightRatio));
+  if (targetWidth >= width || targetHeight >= height) {
+    return source;
+  }
+  const x = Math.floor((width - targetWidth) / 2);
+  const y = Math.floor((height - targetHeight) / 2);
+  return cropCanvas(source, x, y, targetWidth, targetHeight);
+}
+
+function cropCanvas(source: HTMLCanvasElement, x: number, y: number, width: number, height: number): HTMLCanvasElement {
+  const safeWidth = Math.max(1, Math.min(source.width - x, width));
+  const safeHeight = Math.max(1, Math.min(source.height - y, height));
+  if (safeWidth >= source.width && safeHeight >= source.height) {
+    return source;
+  }
+
+  const cropped = document.createElement('canvas');
+  cropped.width = safeWidth;
+  cropped.height = safeHeight;
+  const ctx = cropped.getContext('2d', { willReadFrequently: true });
+  if (!ctx) {
+    return source;
+  }
+  ctx.drawImage(source, x, y, safeWidth, safeHeight, 0, 0, safeWidth, safeHeight);
+  return cropped;
 }
 
 type GridRegion = {
@@ -438,6 +805,15 @@ function cropAndUpscaleRegion(
 function hasStrongCandidate(candidates: Map<string, OcrCandidate>): boolean {
   for (const candidate of candidates.values()) {
     if (candidate.digits.length >= 5) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasHighQualityCandidate(candidates: Map<string, OcrCandidate>): boolean {
+  for (const candidate of candidates.values()) {
+    if (scoreCandidate(candidate) >= 0.78) {
       return true;
     }
   }

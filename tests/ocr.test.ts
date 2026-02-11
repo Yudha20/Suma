@@ -29,8 +29,29 @@ describe('pickBestOcrCandidate', () => {
     expect(digits).toContain('500072');
   });
 
+  it('normalizes common handwritten lookalikes when token has digits', () => {
+    const digits = extractDigitsFromText('receipt id: S0B2');
+    expect(digits).toContain('5082');
+  });
+
+  it('does not treat alphabetic words as number runs', () => {
+    const digits = extractDigitsFromText('Store name: BOSS');
+    expect(digits).not.toContain('8055');
+  });
+
   it('does not merge across words', () => {
     const digits = extractDigitsFromText('North 1, 2 West 3, 4');
+    expect(digits).not.toContain('1234');
+  });
+
+  it('does not create 8-digit slices from long numeric ids', () => {
+    const digits = extractDigitsFromText('Asset id: 2618033377');
+    expect(digits).not.toContain('26180333');
+    expect(digits).not.toContain('18033377');
+  });
+
+  it('does not merge digit groups across long separators', () => {
+    const digits = extractDigitsFromText('12 ..... 34');
     expect(digits).not.toContain('1234');
   });
 
