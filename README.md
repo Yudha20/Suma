@@ -33,10 +33,10 @@ Working product direction: "Math in the Wild" MVP.
 
 ## Project docs
 
-- Architecture: `/Users/yudha/Downloads/Suma/Architecture.md`
-- Coding standards: `/Users/yudha/Downloads/Suma/Coding_Standards.md`
-- Implementation plan: `/Users/yudha/Downloads/Suma/Implementation_plan.md`
-- Extended notes: `/Users/yudha/Downloads/Suma/Extended_Notes.md`
+- Architecture: [`Architecture.md`](./Architecture.md)
+- Coding standards: [`Coding_Standards.md`](./Coding_Standards.md)
+- Implementation plan: [`Implementation_plan.md`](./Implementation_plan.md)
+- Extended notes: [`Extended_Notes.md`](./Extended_Notes.md)
 
 ## Quick start
 
@@ -48,7 +48,6 @@ Working product direction: "Math in the Wild" MVP.
 ### Install and run
 
 ```bash
-cd /Users/yudha/Downloads/Suma
 npm install
 npm run dev
 ```
@@ -56,7 +55,6 @@ npm run dev
 Or use:
 
 ```bash
-cd /Users/yudha/Downloads/Suma
 ./start.sh
 ```
 
