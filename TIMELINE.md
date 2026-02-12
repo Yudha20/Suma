@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 15:49:24 GMT+5:30 (+0530)
+Last updated: 2026-02-12 15:56:28 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,16 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 15:56:28 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 2 file(s) (2 UI/UX, 0 other).
+- UI/UX touched: `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Codex thread activity: 5 new message(s) across 2 workspace thread(s).
+- Key thread updates:
+- UI/UX: assistant - - Replaced brightness number entry on `/app/tune/page.tsx:198` with a slider that moves in 5-unit intervals and shows the current value, so the control is ea...
+- UI/UX: assistant - `framer-motion` is unavailable in this environment right now, so I’m implementing the same liquid-drag interaction natively (pointer + velocity + trailing th...
+- UI/UX: assistant - I’ve swapped the component logic to native drag + liquid thumb. Next I’m updating only the segmented-control CSS primitives so the new thumb/trail behave smo...
+- UI/UX: assistant - I’ve finished the component and style integration. I’m running tests and a build check now to ensure the drag behavior compiles cleanly and doesn’t break exi...
 
 - **2026-02-12 15:49:24 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
@@ -197,7 +207,8 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- _(none)_
+- `components/SegmentedControl.tsx`
+- `styles/globals.css`
 
 ## How To Read This File
 
