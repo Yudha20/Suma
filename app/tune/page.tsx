@@ -207,7 +207,11 @@ export default function TunePage() {
                 min={-40}
                 max={40}
                 step={5}
-                onChange={(event) => setBrightnessTweak(clampBrightnessTweak(Number(event.target.value)))}
+                onChange={(event) => {
+                  const rawValue = Number(event.target.value);
+                  const stepped = Math.round(rawValue / 5) * 5;
+                  setBrightnessTweak(clampBrightnessTweak(stepped));
+                }}
                 className="h-2 w-full appearance-none rounded bg-transparent text-text outline-none"
               />
             </div>
