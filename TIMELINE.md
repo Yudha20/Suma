@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 15:56:53 GMT+5:30 (+0530)
+Last updated: 2026-02-12 16:38:08 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,17 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 16:38:08 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 19 new message(s) across 3 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Regression/Fix: assistant - I’m going to reproduce the issue locally first, then trace whether this is a server/runtime problem or a styling/render pipeline break. I’ll check repo statu...
+- Regression/Fix: assistant - `app/layout.tsx` still imports `styles/globals.css`, so CSS should load if the stylesheet is valid. I’ll now check for syntax/build errors and run the app lo...
+- Regression/Fix: assistant - Build succeeds, so this looks like a runtime/dev-server issue rather than a compile failure. I’ll inspect the recently changed UI files and then validate wha...
+- Regression/Fix: assistant - I haven’t found a broken source file yet, so I’m checking the live dev server output next. This will tell us if you’re actually hitting Next.js with CSS asse...
+- Regression/Fix: assistant - The CSS URL extraction script had a parsing bug from duplicate matches; I’m fixing that and re-running to test one exact HTML->CSS pair.
 
 - **2026-02-12 16:38 GMT+5:30** (commit `feat: Liquid Glass Micro-Interactions`)
   - **Segmented Control Interaction Refinement:**
@@ -222,8 +233,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- `components/SegmentedControl.tsx`
-- `styles/globals.css`
+- _(none)_
 
 ## How To Read This File
 
