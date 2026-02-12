@@ -44,6 +44,13 @@ export async function GET() {
 }
 
 function parseExpectedFromFilename(file: string): string | null {
-  const match = file.match(/-(\d{2,8})(?=\.[^.]+$)/);
-  return match ? match[1] : null;
+  // Strip the file extension, then grab everything after the last hyphen.
+  const stem = file.replace(/\.[^.]+$/, '');
+  const lastHyphen = stem.lastIndexOf('-');
+  if (lastHyphen === -1) {
+    return null;
+  }
+  const tail = stem.slice(lastHyphen + 1).trim();
+  // Accept pure digit strings of any length (1+).
+  return /^\d+$/.test(tail) ? tail : null;
 }
