@@ -199,15 +199,16 @@ export default function TunePage() {
       <ConsoleCard>
         <div className="grid gap-3 sm:grid-cols-3">
           <label className="flex flex-col gap-1 neu-label">
-            Brightness
+            Brightness ({brightnessTweak})
             <div className="neu-inset">
               <input
-                type="number"
+                type="range"
                 value={brightnessTweak}
                 min={-40}
                 max={40}
+                step={5}
                 onChange={(event) => setBrightnessTweak(clampBrightnessTweak(Number(event.target.value)))}
-                className="w-full rounded-field bg-transparent px-3 py-2 text-sm text-text outline-none"
+                className="h-2 w-full appearance-none rounded bg-transparent text-text outline-none"
               />
             </div>
           </label>
