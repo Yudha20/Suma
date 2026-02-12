@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { useEffect, useRef } from 'react';
 import { ConsoleShell } from '@/components/ConsoleShell';
 import { ConsoleCard } from '@/components/ConsoleCard';
@@ -63,51 +64,55 @@ export default function HomePage() {
 
   return (
     <ConsoleShell>
-      <HomeHeader />
+      <div className="stagger-in" style={{ '--si': 0 } as CSSProperties}>
+        <HomeHeader />
+      </div>
 
-      <ConsoleCard>
-        <div className="flex flex-col gap-6">
-          <HomeSetupPanel
-            seedInput={seedInput}
-            surpriseNote={surpriseNote}
-            onSeedChange={setSeedInput}
-            settings={settings}
-            digitOptions={digitOptions}
-            tempoOptions={tempoOptions}
-            onDigitsChange={handleDigitsChange}
-            onTempoChange={handleTempoChange}
-            onBrightnessChange={handleBrightnessChange}
-          />
+      <div className="stagger-in" style={{ '--si': 1 } as CSSProperties}>
+        <ConsoleCard>
+          <div className="flex flex-col gap-6">
+            <HomeSetupPanel
+              seedInput={seedInput}
+              surpriseNote={surpriseNote}
+              onSeedChange={setSeedInput}
+              settings={settings}
+              digitOptions={digitOptions}
+              tempoOptions={tempoOptions}
+              onDigitsChange={handleDigitsChange}
+              onTempoChange={handleTempoChange}
+              onBrightnessChange={handleBrightnessChange}
+            />
 
-          <HomeActionPanel
-            onStart={handleStart}
-            onSurprise={handleSurprise}
-            onPhotoClick={() => fileInputRef.current?.click()}
-            isPhotoProcessing={isPhotoProcessing}
-            photoStatus={photoStatus}
-            photoMessage={photoMessage}
-            photoCandidates={photoCandidates}
-            photoSwatches={photoSwatches}
-            photoExplainability={photoExplainability}
-          />
-          <p className="text-xs text-text-dim">
-            Tip: press Cmd+V or Ctrl+V to paste an image and start scanning instantly.
-          </p>
+            <HomeActionPanel
+              onStart={handleStart}
+              onSurprise={handleSurprise}
+              onPhotoClick={() => fileInputRef.current?.click()}
+              isPhotoProcessing={isPhotoProcessing}
+              photoStatus={photoStatus}
+              photoMessage={photoMessage}
+              photoCandidates={photoCandidates}
+              photoSwatches={photoSwatches}
+              photoExplainability={photoExplainability}
+            />
+            <p className="text-xs text-text-dim">
+              Tip: press Cmd+V or Ctrl+V to paste an image and start scanning instantly.
+            </p>
 
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            capture="environment"
-            className="a11y-sr"
-            onChange={(event) => {
-              const file = event.target.files?.[0] ?? null;
-              void handlePhotoFile(file);
-              event.currentTarget.value = '';
-            }}
-          />
-        </div>
-      </ConsoleCard>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              capture="environment"
+              className="a11y-sr"
+              onChange={(event) => {
+                const file = event.target.files?.[0] ?? null;
+                void handlePhotoFile(file);
+                event.currentTarget.value = '';
+              }}
+            />
+          </div>
+        </ConsoleCard>
+      </div>
     </ConsoleShell>
   );
 }

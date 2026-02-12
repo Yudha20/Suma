@@ -78,7 +78,10 @@
   /* Motion */
   --t-fast: 120ms;
   --t-normal: 180ms;
+  --t-slow: 350ms;
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.22, 1.28, 0.36, 1);
 
   /* Spacing base */
   --gap: 4px;
@@ -159,26 +162,29 @@ textarea {
 /* ─── Neumorphic: Inset well ──────────────────── */
 
 .neu-inset {
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.30);
   border-radius: var(--r-field);
-  border: 1px solid var(--stroke-soft);
+  border: none;
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.60) inset,
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+    inset 0 3px 8px rgba(0, 0, 0, 0.70),
+    inset 0 1px 2px rgba(0, 0, 0, 0.50),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: box-shadow var(--t-slow) var(--ease-out);
 }
 
 .neu-inset:focus-within {
-  border-color: rgba(255, 255, 255, 0.16);
   box-shadow:
-    0 8px 20px rgba(0, 0, 0, 0.60) inset,
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 0 0 4px rgba(255, 255, 255, 0.06);
+    inset 0 4px 12px rgba(0, 0, 0, 0.80),
+    inset 0 1px 3px rgba(0, 0, 0, 0.60),
+    0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 0 2px rgba(255, 255, 255, 0.08);
 }
 
 /* ─── Neumorphic: Segment rail ────────────────── */
 
 .neu-segment-rail {
   display: flex;
+  position: relative;
   overflow: hidden;
   background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
   border-radius: var(--r-capsule);
@@ -187,7 +193,24 @@ textarea {
     0 2px 0 rgba(255, 255, 255, 0.05) inset,
     0 -1px 0 rgba(0, 0, 0, 0.65) inset,
     0 0 0 1px var(--stroke-soft) inset;
-  padding: 0;
+  padding: 4px;
+}
+
+/* Sliding indicator pill */
+.neu-segment-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  border-radius: calc(var(--r-capsule) - 4px);
+  background: linear-gradient(180deg, var(--surface-selected-0), var(--surface-selected-1));
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.50),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 0 14px rgba(255, 255, 255, 0.05);
+  transition: transform 420ms var(--ease-spring);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .neu-segment {
@@ -195,23 +218,25 @@ textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
+  min-height: 40px;
   padding: 8px 4px;
   background: transparent;
   border: none;
+  border-radius: calc(var(--r-capsule) - 4px);
   color: var(--text-dim);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition:
-    color var(--t-fast) var(--ease),
-    background var(--t-fast) var(--ease),
-    box-shadow var(--t-fast) var(--ease);
   position: relative;
+  z-index: 1;
+  transition:
+    color var(--t-normal) var(--ease),
+    transform var(--t-fast) var(--ease-spring),
+    text-shadow 400ms var(--ease-out);
 }
 
 /* Carved seam divider */
-.neu-segment + .neu-segment::before {
+.neu-segment+.neu-segment::before {
   content: '';
   position: absolute;
   left: 0;
@@ -220,25 +245,29 @@ textarea {
   width: 1px;
   background: var(--seam);
   box-shadow: -1px 0 0 rgba(255, 255, 255, 0.03);
+  transition: opacity 300ms var(--ease-out);
+  z-index: 2;
+}
+
+/* Hide seams adjacent to the active indicator */
+.neu-segment[data-hide-seam='true']::before {
+  opacity: 0;
 }
 
 .neu-segment:hover {
   color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.02);
 }
 
 .neu-segment:active {
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.70) inset,
-    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+  transform: scale(0.95);
+  transition-duration: 60ms;
 }
 
 .neu-segment[data-active='true'] {
   color: var(--text);
-  background: linear-gradient(180deg, var(--surface-selected-0), var(--surface-selected-1));
-  box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.50) inset,
-    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+  background: transparent;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.25);
+  animation: breathe 3.5s ease-in-out infinite;
 }
 
 /* ─── Neumorphic: Buttons ─────────────────────── */
@@ -256,31 +285,38 @@ textarea {
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  position: relative;
+  z-index: 10;
   box-shadow:
     0 14px 28px rgba(0, 0, 0, 0.55),
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
     0 0 0 1px var(--stroke-soft) inset;
   transition:
-    box-shadow var(--t-fast) var(--ease),
-    background var(--t-fast) var(--ease);
+    transform 400ms var(--ease-spring),
+    box-shadow 300ms var(--ease-out);
+  will-change: transform;
 }
 
 .neu-btn-primary:hover {
+  transform: translateY(-2px);
   box-shadow:
-    0 14px 28px rgba(0, 0, 0, 0.55),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 18px 36px rgba(0, 0, 0, 0.60),
+    0 2px 0 rgba(255, 255, 255, 0.07) inset,
     0 0 0 1px var(--stroke-strong) inset;
 }
 
 .neu-btn-primary:active {
+  transform: translateY(1px) scale(0.97);
   box-shadow:
     0 2px 8px rgba(0, 0, 0, 0.70) inset,
     0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+  transition-duration: 80ms;
 }
 
 .neu-btn-primary:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.30),
     0 0 0 1px var(--stroke-soft) inset;
@@ -301,32 +337,42 @@ textarea {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   cursor: pointer;
+  position: relative;
+  z-index: 10;
   box-shadow:
     0 8px 18px rgba(0, 0, 0, 0.35),
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 0 0 1px var(--stroke-soft) inset;
   transition:
-    color var(--t-fast) var(--ease),
-    box-shadow var(--t-fast) var(--ease);
+    transform 400ms var(--ease-spring),
+    color var(--t-normal) var(--ease),
+    box-shadow 300ms var(--ease-out),
+    letter-spacing 300ms var(--ease-out);
+  will-change: transform;
 }
 
 .neu-btn-secondary:hover {
   color: var(--text);
+  transform: translateY(-1px);
+  letter-spacing: 0.17em;
   box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 10px 22px rgba(0, 0, 0, 0.40),
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 0 0 1px var(--stroke-strong) inset;
 }
 
 .neu-btn-secondary:active {
+  transform: translateY(1px) scale(0.96);
   box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.60) inset,
     0 -1px 0 rgba(255, 255, 255, 0.03) inset;
+  transition-duration: 80ms;
 }
 
 .neu-btn-secondary:disabled {
   opacity: 0.40;
   cursor: not-allowed;
+  transform: none;
 }
 
 /* ─── Labels ──────────────────────────────────── */
@@ -382,6 +428,25 @@ input[type='range']::-webkit-slider-thumb {
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
   cursor: pointer;
   border: none;
+  transition:
+    transform 250ms var(--ease-spring),
+    box-shadow 250ms var(--ease-out);
+}
+
+input[type='range']:hover::-webkit-slider-thumb {
+  transform: scale(1.25);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.60),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 10px rgba(255, 255, 255, 0.06);
+}
+
+input[type='range']:active::-webkit-slider-thumb {
+  transform: scale(1.15);
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.50),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 16px rgba(255, 255, 255, 0.08);
 }
 
 input[type='range']::-moz-range-thumb {
@@ -396,6 +461,48 @@ input[type='range']::-moz-range-thumb {
   border: none;
 }
 
+/* ─── Entrance animations ─────────────────────── */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes breathe {
+
+  0%,
+  100% {
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.20);
+  }
+
+  50% {
+    text-shadow: 0 0 14px rgba(255, 255, 255, 0.40);
+  }
+}
+
+.stagger-in {
+  animation: fadeInUp 650ms var(--ease-out) both;
+  animation-delay: calc(var(--si, 0) * 80ms + 50ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger-in {
+    animation: none;
+    opacity: 1;
+  }
+
+  .neu-segment[data-active='true'] {
+    animation: none;
+  }
+}
+
 /* ─── Animations (preserved from original) ────── */
 
 @keyframes suma-correct-pulse {
@@ -403,9 +510,11 @@ input[type='range']::-moz-range-thumb {
     box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
     transform: translateZ(0);
   }
+
   35% {
     box-shadow: 0 0 0 2px rgba(5, 192, 40, 0.45), 0 0 14px rgba(5, 192, 40, 0.2);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
   }
@@ -416,16 +525,20 @@ input[type='range']::-moz-range-thumb {
     transform: translateX(0);
     box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
   }
+
   25% {
     transform: translateX(-2px);
   }
+
   50% {
     transform: translateX(2px);
     box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.55), 0 0 18px rgba(248, 113, 113, 0.22);
   }
+
   75% {
     transform: translateX(-2px);
   }
+
   100% {
     transform: translateX(0);
     box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);

@@ -10,6 +10,12 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Timeline (Date/Time + What Happened)
 
+- **2026-02-12 08:54 GMT+5:30** (commit `UI Fixes`)
+  - **Neumorphic UI Polish & Fixes:**
+    - Fixed **Segmented Control** alignment: logic now correctly accounts for rail padding (`calc((100% - 8px) / N)`), preventing indicator overflow.
+    - Fixed **Home Action Buttons**: added explicit `z-index: 10` and `position: relative` to `.neu-btn-primary` and `.neu-btn-secondary` to resolve click intercept issues by invisible overlays.
+    - Verified all micro-interactions (staggered entrance, spring physics, hover states) and navigation flows in browser.
+
 - **2026-02-12 08:18:11 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 36 file(s) (22 UI/UX, 14 other).
 - UI/UX touched: `app/page.tsx`, `app/stats/page.tsx`, `app/train/page.tsx`, `app/tune/page.tsx`, `components/AnswerInput.tsx`, `components/ConsoleCard.tsx`, `components/ConsoleShell.tsx`, `components/HomeActionPanel.tsx`, +14 more.

@@ -18,13 +18,13 @@ export function SeedInput({
       <label className="neu-label">
         Number from your day
       </label>
-      <div className="neu-inset">
+      <div className="neu-inset p-1">
         <input
           value={value}
           onChange={handleChange}
           inputMode="numeric"
           placeholder="Optional seed"
-          className="h-12 w-full rounded-field bg-transparent px-4 text-lg text-text placeholder:text-text-dim outline-none"
+          className="h-11 w-full rounded-[10px] bg-transparent px-3 text-lg text-text placeholder:text-text-dim outline-none"
           aria-describedby={note ? 'surprise-note' : undefined}
         />
       </div>
