@@ -34,7 +34,6 @@ export function SegmentedControl<T extends string | number>({
   const [thumbX, setThumbX] = useState(0);
   const [stretch, setStretch] = useState(0);
   const [pressed, setPressed] = useState(false);
-  const [pointerHeld, setPointerHeld] = useState(false);
   const [bouncing, setBouncing] = useState(false);
 
   const DRAG_THRESHOLD = 4;
@@ -173,7 +172,6 @@ export function SegmentedControl<T extends string | number>({
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     downOriginRef.current = { x: event.clientX, y: event.clientY };
     pointerRef.current = { x: event.clientX, t: performance.now() };
-    setPointerHeld(true);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -205,7 +203,6 @@ export function SegmentedControl<T extends string | number>({
     downOriginRef.current = null;
     pointerRef.current = null;
     setDragging(false);
-    setPointerHeld(false);
 
     if (wasDragging) {
       /* Was a real drag — snap back to nearest segment */
@@ -234,7 +231,7 @@ export function SegmentedControl<T extends string | number>({
     dragging ? 'is-dragging' : '',
     settling ? 'is-settling' : '',
     pressed ? 'is-pressed' : '',
-    pointerHeld && !dragging ? 'is-held' : '',
+
     bouncing ? 'is-bouncing' : ''
   ]
     .filter(Boolean)
@@ -253,7 +250,6 @@ export function SegmentedControl<T extends string | number>({
           downOriginRef.current = null;
           pointerRef.current = null;
           setDragging(false);
-          setPointerHeld(false);
         }}
         style={{ touchAction: 'none' }}
         role="radiogroup"
@@ -272,8 +268,7 @@ export function SegmentedControl<T extends string | number>({
           className="neu-segment-thumb"
           style={{
             width: segmentWidth,
-            transform: `translateX(${thumbX}px) scaleX(${scaleX}) scaleY(${scaleY})`,
-            scale: pointerHeld && !dragging ? '0.985 1.015' : undefined
+            transform: `translateX(${thumbX}px) scaleX(${scaleX}) scaleY(${scaleY})`
           }}
           aria-hidden="true"
         >

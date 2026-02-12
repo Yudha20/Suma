@@ -289,11 +289,6 @@ textarea {
   animation: thumbPress 200ms var(--ease-out);
 }
 
-/* Pointer held down: subtle scale squish for tactile press feel */
-.neu-segment-rail.is-held .neu-segment-thumb {
-  transform-origin: center center;
-  transition: transform 100ms var(--ease);
-}
 
 /* Re-tap bounce: elastic jiggle on the already-active segment */
 @keyframes thumbBounce {
