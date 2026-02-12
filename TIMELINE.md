@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 11:20:49 GMT+5:30 (+0530)
+Last updated: 2026-02-12 11:25:16 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,20 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 11:25:16 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 1 file(s) (0 UI/UX, 1 other).
+- Other engineering changes: `TIMELINE.md`.
+- Codex thread activity: 2 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: user - update timeline now and push to git
+- Engineering: assistant - I’m doing it now: run `timeline:sync`, commit the resulting `TIMELINE.md` update, then push with the pre-push guard.
+
+- **2026-02-12 11:23:46 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 2 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - Done. I updated uncommitted changes, synced timeline, committed, and pushed to `origin/main`. Pushed commits: 1. `4222f35` - `Update timeline and local chang...
 
 - **2026-02-12 11:20:49 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
@@ -149,7 +163,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- _(none)_
+- `TIMELINE.md`
 
 ## How To Read This File
 
