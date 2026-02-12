@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 15:56:28 GMT+5:30 (+0530)
+Last updated: 2026-02-12 15:56:53 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,21 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 16:38 GMT+5:30** (commit `feat: Liquid Glass Micro-Interactions`)
+  - **Segmented Control Interaction Refinement:**
+    - Restored elastic spring physics (420ms) for segment selection.
+    - Implemented **Tap vs. Drag separation** to prevent pointer capture from swallowing clicks.
+    - Added subtle **Pressed-down state** (scale squish) for tactile feedback.
+    - Added **Re-tap bounce** (jelly wobble) on already-active segments.
+    - Tuned animations for uniform feel across all segment widths.
+
+- **2026-02-12 15:56:53 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 2 file(s) (2 UI/UX, 0 other).
+- UI/UX touched: `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Codex thread activity: 1 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- UI/UX: assistant - I’m making one final hardening tweak: marking the segmented component as client-only to prevent any server-component import edge cases with hooks. Then I’ll ...
 
 - **2026-02-12 15:56:28 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 2 file(s) (2 UI/UX, 0 other).

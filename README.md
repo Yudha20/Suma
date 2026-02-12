@@ -45,6 +45,8 @@ Working product direction: "Math in the Wild" MVP.
 - Node 20 (see `.nvmrc`)
 - npm
 
+If you run the app with a different Node major version, `npm run dev` now exits early with a clear error instead of serving a partially broken UI.
+
 ### Install and run
 
 ```bash
