@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 11:26:39 GMT+5:30 (+0530)
+Last updated: 2026-02-12 15:48:48 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,24 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 15:48:48 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 1 file(s) (0 UI/UX, 1 other).
+- Other engineering changes: `TIMELINE.md`.
+- Codex thread activity: 14 new message(s) across 2 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- UI/UX: user - can you do it so that if i drag across segmented controls, it give me a drag effect? just like liquid glss but in neomorphic effect of ours? i've got somethi...
+- UI/UX: assistant - Yes, I can adopt that Framer Motion-driven liquid drag behavior. The component already fits our neumorphic language (rounded capsules, gradients, soft shadow...
+- UI/UX: assistant - I’m proceeding with the integration now: I’ll replace the current segmented control behavior with a drag-enabled liquid thumb interaction, keep the existing ...
+- UI/UX: assistant - I’m implementing this with your Framer-style motion model. First I’ll install `framer-motion`, then replace the segmented control internals with pointer-drag...
+- Engineering: assistant - I checked current setup: segmented control is still static and `framer-motion` isn’t in dependencies, so I’m integrating your drag model directly and adding ...
+
+- **2026-02-12 15:06:15 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 1 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - Done. `TIMELINE.md` was updated and pushed to GitHub. Result: - Pushed branch: `main` - Latest pushed commit: `b3c159b` - Working tree: clean (`git status` e...
 
 - **2026-02-12 11:26:39 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
@@ -173,7 +191,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- _(none)_
+- `TIMELINE.md`
 
 ## How To Read This File
 
