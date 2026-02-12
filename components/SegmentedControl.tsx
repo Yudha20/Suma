@@ -42,7 +42,7 @@ export function SegmentedControl<T extends string | number>({
               onClick={() => onChange(option.value)}
               data-active={active}
               data-hide-seam={hideSeam || undefined}
-              className="neu-segment"
+              className="neu-segment geist-mono"
             >
               {option.label}
             </button>

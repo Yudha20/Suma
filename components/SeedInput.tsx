@@ -14,7 +14,7 @@ export function SeedInput({
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 min-h-[88px]">
       <label className="neu-label">
         Number from your day
       </label>
@@ -24,15 +24,13 @@ export function SeedInput({
           onChange={handleChange}
           inputMode="numeric"
           placeholder="Optional seed"
-          className="h-11 w-full rounded-[10px] bg-transparent px-3 text-lg text-text placeholder:text-text-dim outline-none"
+          className="h-12 w-full rounded-[10px] bg-transparent px-3 text-lg text-text placeholder:text-text-dim outline-none geist-mono"
           aria-describedby={note ? 'surprise-note' : undefined}
         />
       </div>
-      {note ? (
-        <p id="surprise-note" className="text-xs text-text-muted">
-          {note}
-        </p>
-      ) : null}
+      <p id="surprise-note" className="text-xs text-text-muted min-h-[16px]">
+        {note ?? '\u00A0'}
+      </p>
     </div>
   );
 }

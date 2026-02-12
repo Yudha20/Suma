@@ -43,9 +43,9 @@ export function AnswerInput({
               onSubmit();
             }
           }}
-          inputMode="numeric"
-          disabled={disabled}
-          className="h-12 w-full rounded-field bg-transparent px-4 text-lg text-text disabled:opacity-60 outline-none"
+        inputMode="numeric"
+        disabled={disabled}
+        className="h-12 w-full rounded-field bg-transparent px-4 text-lg text-text disabled:opacity-60 outline-none geist-mono"
           aria-label="Your answer"
         />
       </div>

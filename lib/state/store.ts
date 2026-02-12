@@ -53,7 +53,7 @@ export const useAppStore = create<StoreState>((set, get) => ({
   startSession: (mode, seed, seedSource) => {
     const settings = get().settings;
     const config = createSessionConfig(mode, seed, seedSource, settings);
-    const fixQueue = buildFixQueue(get().attempts, mode);
+    const fixQueue = mode === 'fix' ? buildFixQueue(get().attempts, mode) : [];
     const question = fixQueue[0] ?? generateQuestionAtIndex(config, 0, []);
     const queue = fixQueue.length > 0 ? fixQueue.slice(1) : [];
     const session: SessionState = {

@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 08:18:11 GMT+5:30 (+0530)
+Last updated: 2026-02-12 11:20:36 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,44 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-12 11:20:36 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 11 file(s) (6 UI/UX, 5 other).
+- UI/UX touched: `app/tune/page.tsx`, `components/AnswerInput.tsx`, `components/HomeActionPanel.tsx`, `components/SeedInput.tsx`, `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `.githooks/pre-push`, `lib/hooks/useTrainController.ts`, `lib/state/store.ts`, `tests/store.test.ts`, `TIMELINE.md`.
+- Codex thread activity: 5 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - Done. I implemented a hard pre-push guard for your repo. ### Implemented - Added hook: `/Users/yudha/Downloads/Suma/.githooks/pre-push` - Enabled repo hook p...
+- Engineering: user - Sure like no verify I can bypass however, every time I say get Pushti ensure that the timeline is updated and only then it should push
+- Engineering: assistant - Understood. From now on, whenever you ask me to `git push`, I will do this sequence: 1. `npm run timeline:sync` 2. Verify `/Users/yudha/Downloads/Suma/TIMELI...
+- Engineering: user - uncommitted changes need to be updated too and push to git
+- Engineering: assistant - I’ll take all current uncommitted changes through the full flow now: sync `TIMELINE.md`, commit everything, and push. I’ll run it in a tight sequence so the ...
+
+- **2026-02-12 11:18:13 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 11 file(s) (6 UI/UX, 5 other).
+- UI/UX touched: `app/tune/page.tsx`, `components/AnswerInput.tsx`, `components/HomeActionPanel.tsx`, `components/SeedInput.tsx`, `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `.githooks/pre-push`, `lib/hooks/useTrainController.ts`, `lib/state/store.ts`, `tests/store.test.ts`, `TIMELINE.md`.
+- Codex thread activity: 72 new message(s) across 3 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: assistant - The code quality is solid: functionality is organized around composable `use*` controllers and shared layout/utility components, keeping UI logic separate fr...
+- Regression/Fix: assistant - **Code Differences** - **Tailwind + globals**: Introduced `consoleSurface*` palette, `consoleEdgeSoft`, new shadows, and updated body background (radial + li...
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Regression/Fix: assistant - Adjusted. The “correct answer” feedback no longer uses the harsh neon green pulse. - Updated `/Users/yudha/Downloads/Suma/styles/globals.css:674` to a softer...
+- Regression/Fix: assistant - Root cause was in session startup: Sprint/Session modes were always preloading the historical fix queue first, so you kept seeing the same recycled prompts i...
+- Regression/Fix: assistant - I also want to give you a stronger guarantee for this exact bug, so I’m adding a regression test that asserts Sprint/Session start from seeded generation (no...
+
+- **2026-02-12 11:18:02 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 10 file(s) (6 UI/UX, 4 other).
+- UI/UX touched: `app/tune/page.tsx`, `components/AnswerInput.tsx`, `components/HomeActionPanel.tsx`, `components/SeedInput.tsx`, `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `.githooks/pre-push`, `lib/hooks/useTrainController.ts`, `lib/state/store.ts`, `tests/store.test.ts`.
+- Codex thread activity: 72 new message(s) across 3 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: assistant - The code quality is solid: functionality is organized around composable `use*` controllers and shared layout/utility components, keeping UI logic separate fr...
+- Regression/Fix: assistant - **Code Differences** - **Tailwind + globals**: Introduced `consoleSurface*` palette, `consoleEdgeSoft`, new shadows, and updated body background (radial + li...
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Regression/Fix: assistant - Adjusted. The “correct answer” feedback no longer uses the harsh neon green pulse. - Updated `/Users/yudha/Downloads/Suma/styles/globals.css:674` to a softer...
+- Regression/Fix: assistant - Root cause was in session startup: Sprint/Session modes were always preloading the historical fix queue first, so you kept seeing the same recycled prompts i...
+- Regression/Fix: assistant - I also want to give you a stronger guarantee for this exact bug, so I’m adding a regression test that asserts Sprint/Session start from seeded generation (no...
 
 - **2026-02-12 08:54 GMT+5:30** (commit `UI Fixes`)
   - **Neumorphic UI Polish & Fixes:**
@@ -105,41 +143,16 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- `.gitignore`
-- `app/page.tsx`
-- `app/stats/page.tsx`
-- `app/train/page.tsx`
+- `.githooks/pre-push`
 - `app/tune/page.tsx`
 - `components/AnswerInput.tsx`
-- `components/ConsoleCard.tsx`
-- `components/ConsoleShell.tsx`
 - `components/HomeActionPanel.tsx`
-- `components/HomeHeader.tsx`
-- `components/HomeSetupPanel.tsx`
-- `components/PhotoExplainDrawer.tsx`
-- `components/PromptDisplay.tsx`
 - `components/SeedInput.tsx`
 - `components/SegmentedControl.tsx`
-- `components/SessionSummary.tsx`
-- `design.md`
 - `lib/hooks/useTrainController.ts`
-- `lib/ocr/tesseractClient.ts`
-- `lib/photo/binarize.ts`
-- `lib/photo/ocr.ts`
-- `lib/photo/pipeline.ts`
-- `package.json`
-- `public/Inspiration/image 48.png`
-- `public/progression/1.png`
-- `public/progression/2.png`
-- `public/tessdata/.gitkeep`
-- `public/tessdata/digits.traineddata.gz`
-- `public/tessdata/eng.traineddata.gz`
-- `README.md`
-- `scripts/timeline_sync.mjs`
-- `start.sh`
+- `lib/state/store.ts`
 - `styles/globals.css`
-- `tailwind.config.ts`
-- `tests/ocr.test.ts`
+- `tests/store.test.ts`
 - `TIMELINE.md`
 
 ## How To Read This File

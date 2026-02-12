@@ -77,9 +77,10 @@ export function useTrainController() {
 
     const moveId = session.currentQuestion.moveId;
     const expected = session.currentQuestion.answer;
+    const normalized = trimmed.toLowerCase();
     const parsed = Number(trimmed);
     const isValid = Number.isFinite(parsed);
-    const isCorrect = isValid && parsed === expected;
+    const isCorrect = normalized !== 'idk' && isValid && parsed === expected;
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
     logEvent('answer_submitted', { moveId });
@@ -113,10 +114,16 @@ export function useTrainController() {
     }
 
     const trimmed = value.trim();
+    const normalized = trimmed.toLowerCase();
     window.clearTimeout(autoSubmitTimerRef.current ?? undefined);
     autoSubmitTimerRef.current = null;
 
     if (trimmed.length === 0) {
+      return;
+    }
+
+    if (normalized === 'idk') {
+      submitAnswer(value);
       return;
     }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { ConsoleCard } from '@/components/ConsoleCard';
 import { ConsoleShell } from '@/components/ConsoleShell';
 import { processPhotoForSeed } from '@/lib/photo/pipeline';
@@ -180,7 +181,12 @@ export default function TunePage() {
     <ConsoleShell>
       <ConsoleCard>
         <div className="flex flex-col gap-3">
-          <h1 className="text-lg font-semibold text-text">Tune OCR</h1>
+          <div className="flex items-center justify-between gap-3">
+            <h1 className="text-lg font-semibold text-text">Tune OCR</h1>
+            <Link href="/" className="neu-btn-secondary w-fit">
+              Back to Home
+            </Link>
+          </div>
           <p className="text-sm text-text-muted">
             Expected value is parsed from the final hyphen in filename. Example:{' '}
             <span className="geist-mono">Capture-2026-02-11-221241-2025.png</span>

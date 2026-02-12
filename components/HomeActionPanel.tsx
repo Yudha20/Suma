@@ -29,15 +29,14 @@ export function HomeActionPanel({
         <button
           type="button"
           onClick={() => onStart('sprint60')}
-          className="neu-btn-primary"
+          className="neu-btn-primary neu-btn-float-only"
         >
           Start Sprint (60s)
         </button>
         <button
           type="button"
           onClick={() => onStart('session120')}
-          className="neu-btn-primary"
-          style={{ opacity: 0.85 }}
+          className="neu-btn-primary neu-btn-primary-muted neu-btn-float-only"
         >
           Start Session (120s)
         </button>
@@ -47,14 +46,14 @@ export function HomeActionPanel({
         <button
           type="button"
           onClick={onSurprise}
-          className="neu-btn-secondary"
+          className="neu-btn-secondary neu-btn-float-only"
         >
           Surprise Me
         </button>
         <button
           type="button"
           onClick={onPhotoClick}
-          className="neu-btn-secondary"
+          className="neu-btn-secondary neu-btn-float-only"
         >
           Photo Mode
         </button>

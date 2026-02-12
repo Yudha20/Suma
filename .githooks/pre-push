@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+if ! command -v npm >/dev/null 2>&1; then
+  if [ -s "$HOME/.nvm/nvm.sh" ]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.nvm/nvm.sh"
+  fi
+fi
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "pre-push blocked: npm is not available, cannot run timeline sync."
+  echo "Install/load Node.js, run: npm run timeline:sync, commit TIMELINE.md, then push again."
+  exit 1
+fi
+
+echo "pre-push: running timeline sync..."
+npm run --silent timeline:sync
+
+if ! git diff --quiet -- TIMELINE.md || ! git diff --cached --quiet -- TIMELINE.md; then
+  echo "pre-push blocked: TIMELINE.md changed during sync or has uncommitted changes."
+  echo "Run: git add TIMELINE.md && git commit -m \"Update timeline\""
+  echo "Then run: git push"
+  exit 1
+fi
+
+echo "pre-push: TIMELINE.md is up to date."

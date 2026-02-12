@@ -224,7 +224,7 @@ textarea {
   border: none;
   border-radius: calc(var(--r-capsule) - 4px);
   color: var(--text-dim);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   position: relative;
@@ -282,44 +282,126 @@ textarea {
   border-radius: var(--r-field);
   background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
   color: var(--text);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
   cursor: pointer;
   position: relative;
   z-index: 10;
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateY(0) scale(1) translateZ(0);
   box-shadow:
-    0 14px 28px rgba(0, 0, 0, 0.55),
+    0 10px 24px rgba(0, 0, 0, 0.48),
     0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.55) inset,
     0 0 0 1px var(--stroke-soft) inset;
   transition:
-    transform 400ms var(--ease-spring),
-    box-shadow 300ms var(--ease-out);
-  will-change: transform;
+    transform 320ms var(--ease-spring),
+    box-shadow 260ms var(--ease-out),
+    color var(--t-normal) var(--ease),
+    text-shadow 260ms var(--ease-out),
+    filter 220ms var(--ease-out);
+  will-change: transform, box-shadow;
+}
+
+.neu-btn-primary::before,
+.neu-btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.neu-btn-primary::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(0deg, rgba(0, 0, 0, 0.08), rgba(0, 0, 0, 0));
+  opacity: 0.34;
+  transition: opacity 260ms var(--ease-out);
+}
+
+.neu-btn-primary::after {
+  left: -35%;
+  right: auto;
+  width: 35%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.08) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transform: translateX(-180%) skewX(-14deg);
+  transition:
+    transform 620ms var(--ease-out),
+    opacity 220ms var(--ease-out);
 }
 
 .neu-btn-primary:hover {
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.01);
+  color: #f6f8fb;
+  filter: saturate(1.06);
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.16);
   box-shadow:
-    0 18px 36px rgba(0, 0, 0, 0.60),
-    0 2px 0 rgba(255, 255, 255, 0.07) inset,
+    0 16px 34px rgba(0, 0, 0, 0.58),
+    0 3px 0 rgba(255, 255, 255, 0.08) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.62) inset,
     0 0 0 1px var(--stroke-strong) inset;
 }
 
+.neu-btn-primary:hover::before {
+  opacity: 0.54;
+}
+
+.neu-btn-primary:hover::after {
+  opacity: 0.9;
+  transform: translateX(420%) skewX(-14deg);
+}
+
 .neu-btn-primary:active {
-  transform: translateY(1px) scale(0.97);
+  transform: translateY(1px) scale(0.985);
+  filter: saturate(0.98);
   box-shadow:
-    0 2px 8px rgba(0, 0, 0, 0.70) inset,
-    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
-  transition-duration: 80ms;
+    0 3px 10px rgba(0, 0, 0, 0.68) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+  transition-duration: 100ms;
+}
+
+.neu-btn-primary:active::after {
+  opacity: 0.18;
+  transform: translateX(120%) skewX(-14deg);
+}
+
+.neu-btn-primary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.56),
+    0 0 0 1px var(--stroke-strong) inset,
+    0 0 0 2px rgba(255, 255, 255, 0.15);
 }
 
 .neu-btn-primary:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  filter: saturate(0.85);
   transform: none;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.30),
     0 0 0 1px var(--stroke-soft) inset;
+}
+
+.neu-btn-primary:disabled::before,
+.neu-btn-primary:disabled::after {
+  opacity: 0;
+}
+
+.neu-btn-primary-muted {
+  color: var(--text-muted);
+  background: linear-gradient(180deg, rgba(42, 44, 45, 0.88), rgba(28, 29, 30, 0.92));
 }
 
 .neu-btn-secondary {
@@ -332,53 +414,135 @@ textarea {
   border-radius: var(--r-pill);
   background: linear-gradient(180deg, rgba(42, 44, 45, 0.6), rgba(28, 29, 30, 0.6));
   color: var(--text-muted);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
   cursor: pointer;
   position: relative;
   z-index: 10;
+  overflow: hidden;
+  isolation: isolate;
+  transform: translateY(0) scale(1) translateZ(0);
   box-shadow:
     0 8px 18px rgba(0, 0, 0, 0.35),
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 0 0 1px var(--stroke-soft) inset;
   transition:
-    transform 400ms var(--ease-spring),
+    transform 320ms var(--ease-spring),
     color var(--t-normal) var(--ease),
-    box-shadow 300ms var(--ease-out),
-    letter-spacing 300ms var(--ease-out);
-  will-change: transform;
+    box-shadow 260ms var(--ease-out),
+    text-shadow 260ms var(--ease-out),
+    filter 220ms var(--ease-out);
+  will-change: transform, box-shadow;
+}
+
+.neu-btn-secondary::before,
+.neu-btn-secondary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.neu-btn-secondary::before {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 55%);
+  opacity: 0.30;
+  transition: opacity 220ms var(--ease-out);
+}
+
+.neu-btn-secondary::after {
+  left: -36%;
+  right: auto;
+  width: 36%;
+  background: linear-gradient(
+    100deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.07) 48%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  opacity: 0;
+  transform: translateX(-180%) skewX(-14deg);
+  transition:
+    transform 620ms var(--ease-out),
+    opacity 220ms var(--ease-out);
 }
 
 .neu-btn-secondary:hover {
   color: var(--text);
-  transform: translateY(-1px);
-  letter-spacing: 0.17em;
+  transform: translateY(-1px) scale(1.01);
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.12);
+  filter: saturate(1.04);
   box-shadow:
     0 10px 22px rgba(0, 0, 0, 0.40),
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
     0 0 0 1px var(--stroke-strong) inset;
 }
 
+.neu-btn-secondary:hover::before {
+  opacity: 0.44;
+}
+
+.neu-btn-secondary:hover::after {
+  opacity: 0.82;
+  transform: translateX(420%) skewX(-14deg);
+}
+
 .neu-btn-secondary:active {
-  transform: translateY(1px) scale(0.96);
+  transform: translateY(1px) scale(0.985);
+  filter: saturate(0.98);
   box-shadow:
     0 2px 6px rgba(0, 0, 0, 0.60) inset,
     0 -1px 0 rgba(255, 255, 255, 0.03) inset;
-  transition-duration: 80ms;
+  transition-duration: 100ms;
+}
+
+.neu-btn-secondary:active::after {
+  opacity: 0.16;
+  transform: translateX(120%) skewX(-14deg);
+}
+
+.neu-btn-secondary:focus-visible {
+  outline: none;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.45),
+    0 0 0 1px var(--stroke-strong) inset,
+    0 0 0 2px rgba(255, 255, 255, 0.13);
 }
 
 .neu-btn-secondary:disabled {
   opacity: 0.40;
   cursor: not-allowed;
+  filter: saturate(0.82);
   transform: none;
+}
+
+.neu-btn-secondary:disabled::before,
+.neu-btn-secondary:disabled::after {
+  opacity: 0;
+}
+
+/* Home action buttons: keep float, remove shimmer/glow */
+.neu-btn-float-only::before,
+.neu-btn-float-only::after {
+  opacity: 0;
+}
+
+.neu-btn-float-only:hover,
+.neu-btn-float-only:active {
+  filter: none;
+}
+
+.neu-btn-float-only:hover {
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
 }
 
 /* ─── Labels ──────────────────────────────────── */
 
 .neu-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.14em;
@@ -501,22 +665,47 @@ input[type='range']::-moz-range-thumb {
   .neu-segment[data-active='true'] {
     animation: none;
   }
+
+  .neu-btn-primary,
+  .neu-btn-secondary,
+  .neu-btn-primary::before,
+  .neu-btn-primary::after,
+  .neu-btn-secondary::before,
+  .neu-btn-secondary::after {
+    transition: none;
+    animation: none;
+  }
+
+  .neu-btn-primary:hover,
+  .neu-btn-primary:active,
+  .neu-btn-secondary:hover,
+  .neu-btn-secondary:active {
+    transform: none;
+  }
 }
 
 /* ─── Animations (preserved from original) ────── */
 
 @keyframes suma-correct-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
-    transform: translateZ(0);
+    box-shadow:
+      0 0 0 0 rgba(111, 232, 193, 0),
+      0 0 0 0 rgba(184, 236, 255, 0);
+    transform: translateZ(0) scale(1);
   }
 
-  35% {
-    box-shadow: 0 0 0 2px rgba(5, 192, 40, 0.45), 0 0 14px rgba(5, 192, 40, 0.2);
+  42% {
+    box-shadow:
+      0 0 0 2px rgba(111, 232, 193, 0.42),
+      0 0 18px rgba(184, 236, 255, 0.18);
+    transform: translateZ(0) scale(1.004);
   }
 
   100% {
-    box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
+    box-shadow:
+      0 0 0 0 rgba(111, 232, 193, 0),
+      0 0 0 0 rgba(184, 236, 255, 0);
+    transform: translateZ(0) scale(1);
   }
 }
 
@@ -546,7 +735,7 @@ input[type='range']::-moz-range-thumb {
 }
 
 .suma-feedback-correct {
-  animation: suma-correct-pulse 160ms ease-out;
+  animation: suma-correct-pulse 220ms var(--ease-out);
 }
 
 .suma-feedback-wrong {
