@@ -4,12 +4,14 @@ export function AnswerInput({
   value,
   onChange,
   onSubmit,
-  disabled
+  disabled,
+  feedback
 }: {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
   disabled?: boolean;
+  feedback?: 'idle' | 'correct' | 'wrong';
 }) {
   const ref = useRef<HTMLInputElement>(null);
 
@@ -19,27 +21,39 @@ export function AnswerInput({
     }
   }, [disabled]);
 
+  const feedbackClass =
+    feedback === 'correct'
+      ? 'suma-feedback-correct'
+      : feedback === 'wrong'
+        ? 'suma-feedback-wrong'
+        : '';
+
   return (
-    <div className="flex items-center gap-2">
-      <input
-        ref={ref}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-        onKeyDown={(event) => {
-          if (event.key === 'Enter') {
-            onSubmit();
-          }
-        }}
-        inputMode="numeric"
-        disabled={disabled}
-        className="h-12 flex-1 rounded-lg border border-consoleEdge bg-black/40 px-3 text-lg text-slate-100 disabled:opacity-60"
-        aria-label="Your answer"
-      />
+    <div className={`flex items-center gap-2 ${feedbackClass}`}>
+      <span className="a11y-sr" aria-live="polite">
+        {feedback === 'correct' ? 'Correct.' : feedback === 'wrong' ? 'Incorrect.' : ''}
+      </span>
+      <div className="neu-inset flex-1">
+        <input
+          ref={ref}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              onSubmit();
+            }
+          }}
+          inputMode="numeric"
+          disabled={disabled}
+          className="h-12 w-full rounded-field bg-transparent px-4 text-lg text-text disabled:opacity-60 outline-none"
+          aria-label="Your answer"
+        />
+      </div>
       <button
         type="button"
         onClick={onSubmit}
         disabled={disabled}
-        className="h-12 rounded-lg border border-accent bg-emerald-500/20 px-4 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/30 disabled:opacity-60"
+        className="neu-btn-primary disabled:opacity-60"
       >
         Enter
       </button>

@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/state/store';
 import { getSessionDurationMs, isFixQuestion } from '@/lib/session/engine';
 import { getSummary } from '@/lib/session/scoring';
 import { logEvent } from '@/lib/metrics/logger';
+
+type AnswerFeedback = 'idle' | 'correct' | 'wrong';
 
 export function useTrainController() {
   const router = useRouter();
@@ -20,6 +22,10 @@ export function useTrainController() {
 
   const [answer, setAnswer] = useState('');
   const [summaryVisible, setSummaryVisible] = useState(false);
+  const [feedback, setFeedback] = useState<AnswerFeedback>('idle');
+  const autoSubmitTimerRef = useRef<number | null>(null);
+  const feedbackTimerRef = useRef<number | null>(null);
+  const isSubmittingRef = useRef(false);
 
   useEffect(() => {
     if (!hydrated) {
@@ -50,25 +56,88 @@ export function useTrainController() {
 
   useEffect(() => {
     setAnswer('');
+    setFeedback('idle');
     if (session?.currentQuestion) {
       logEvent('question_shown', { moveId: session.currentQuestion.moveId });
     }
   }, [session?.currentQuestion?.id]);
 
-  const handleSubmit = () => {
+  const submitAnswer = (value: string) => {
     if (!session || !session.currentQuestion) {
       return;
     }
-    if (answer.trim().length === 0) {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) {
       return;
     }
-    const attempt = answerCurrent(answer, false, false);
-    logEvent('answer_submitted', { moveId: session.currentQuestion.moveId });
-    if (attempt) {
-      logEvent(attempt.isCorrect ? 'answer_correct' : 'answer_incorrect', { moveId: attempt.moveId });
+    if (isSubmittingRef.current) {
+      return;
     }
-    setAnswer('');
+    isSubmittingRef.current = true;
+
+    const moveId = session.currentQuestion.moveId;
+    const expected = session.currentQuestion.answer;
+    const parsed = Number(trimmed);
+    const isValid = Number.isFinite(parsed);
+    const isCorrect = isValid && parsed === expected;
+
+    setFeedback(isCorrect ? 'correct' : 'wrong');
+    logEvent('answer_submitted', { moveId });
+
+    // Keep feedback visible briefly, then advance by recording the attempt.
+    window.clearTimeout(feedbackTimerRef.current ?? undefined);
+    feedbackTimerRef.current = window.setTimeout(() => {
+      const attempt = answerCurrent(value, false, false);
+      if (attempt) {
+        logEvent(attempt.isCorrect ? 'answer_correct' : 'answer_incorrect', { moveId: attempt.moveId });
+      }
+      setAnswer('');
+      setFeedback('idle');
+      isSubmittingRef.current = false;
+    }, 140);
   };
+
+  const handleSubmit = () => {
+    submitAnswer(answer);
+  };
+
+  const handleAnswerChange = (value: string) => {
+    setAnswer(value);
+    setFeedback('idle');
+
+    if (!session?.currentQuestion) {
+      return;
+    }
+    if (summaryVisible) {
+      return;
+    }
+
+    const trimmed = value.trim();
+    window.clearTimeout(autoSubmitTimerRef.current ?? undefined);
+    autoSubmitTimerRef.current = null;
+
+    if (trimmed.length === 0) {
+      return;
+    }
+
+    // Auto-submit on exact correctness immediately, otherwise submit after a short pause.
+    const parsed = Number(trimmed);
+    if (Number.isFinite(parsed) && parsed === session.currentQuestion.answer) {
+      submitAnswer(value);
+      return;
+    }
+
+    autoSubmitTimerRef.current = window.setTimeout(() => {
+      submitAnswer(value);
+    }, 650);
+  };
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(autoSubmitTimerRef.current ?? undefined);
+      window.clearTimeout(feedbackTimerRef.current ?? undefined);
+    };
+  }, []);
 
   const handleExit = () => {
     endSession();
@@ -90,11 +159,12 @@ export function useTrainController() {
   return {
     session,
     answer,
-    setAnswer,
+    setAnswer: handleAnswerChange,
     handleSubmit,
     handleExit,
     summary,
     showSummary,
-    currentFixIndex
+    currentFixIndex,
+    feedback
   } as const;
 }

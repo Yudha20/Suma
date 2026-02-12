@@ -34,11 +34,57 @@
   font-display: swap;
 }
 
+/* ───────────────────────────────────────────────
+   Design tokens — Dark Neumorphic Control-Rail
+   ─────────────────────────────────────────────── */
+
 :root {
   color-scheme: dark;
   font-family: 'Geist', system-ui, 'Inter', sans-serif;
+
+  /* Background ramp */
+  --bg-0: #191919;
+  --bg-1: #212121;
+
+  /* Surface ramp (capsule gradients) */
+  --surface-0: #2A2C2D;
+  --surface-1: #1C1D1E;
+
+  /* Selected segment */
+  --surface-selected-0: #1E1F20;
+  --surface-selected-1: #141516;
+
+  /* Text ramp */
+  --text: #E7EAF0;
+  --text-muted: rgba(231, 234, 240, 0.65);
+  --text-dim: rgba(231, 234, 240, 0.45);
+
+  /* Strokes */
+  --stroke-soft: rgba(255, 255, 255, 0.06);
+  --stroke-strong: rgba(255, 255, 255, 0.10);
+  --seam: rgba(0, 0, 0, 0.85);
+
+  /* Status accent */
+  --accent: #05C028;
+  --accent-glow: rgba(5, 192, 40, 0.25);
+
+  /* Radii */
+  --r-capsule: 28px;
+  --r-segment: 22px;
+  --r-tile: 16px;
+  --r-field: 14px;
+  --r-pill: 999px;
+
+  /* Motion */
+  --t-fast: 120ms;
+  --t-normal: 180ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Spacing base */
   --gap: 4px;
 }
+
+/* ─── Reset ───────────────────────────────────── */
 
 *,
 *::before,
@@ -49,9 +95,11 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background: radial-gradient(80% 80% at 50% 20%, #18261f 0%, #0b0f0d 60%, #080b09 100%);
-  color: #e9f7f0;
+  background-color: var(--bg-0);
+  color: var(--text);
   font-family: 'Geist', system-ui, 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 input,
@@ -61,13 +109,18 @@ textarea {
   font: inherit;
 }
 
+/* ─── Focus ───────────────────────────────────── */
+
 :focus-visible {
-  outline: 2px solid #3ad47f;
+  outline: 2px solid rgba(255, 255, 255, 0.16);
   outline-offset: 3px;
 }
 
+/* ─── Utility classes ─────────────────────────── */
+
 .geist-mono {
   font-family: 'Geist Mono', 'Geist', system-ui, 'Inter', monospace;
+  font-variant-numeric: tabular-nums;
 }
 
 .a11y-sr {
@@ -79,4 +132,310 @@ textarea {
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   border: 0;
+}
+
+/* ─── Neumorphic: Capsule ─────────────────────── */
+
+.neu-capsule {
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  border-radius: var(--r-capsule);
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.65),
+    0 2px 0 rgba(255, 255, 255, 0.05) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.65) inset,
+    0 0 0 1px var(--stroke-soft) inset;
+}
+
+/* Flat variant for Train screen: flatter, higher contrast */
+.neu-capsule-flat {
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  border-radius: var(--r-capsule);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.40),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px var(--stroke-soft) inset;
+}
+
+/* ─── Neumorphic: Inset well ──────────────────── */
+
+.neu-inset {
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: var(--r-field);
+  border: 1px solid var(--stroke-soft);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.60) inset,
+    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.neu-inset:focus-within {
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.60) inset,
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 4px rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Neumorphic: Segment rail ────────────────── */
+
+.neu-segment-rail {
+  display: flex;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  border-radius: var(--r-capsule);
+  box-shadow:
+    0 20px 45px rgba(0, 0, 0, 0.65),
+    0 2px 0 rgba(255, 255, 255, 0.05) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.65) inset,
+    0 0 0 1px var(--stroke-soft) inset;
+  padding: 0;
+}
+
+.neu-segment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 8px 4px;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    color var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+  position: relative;
+}
+
+/* Carved seam divider */
+.neu-segment + .neu-segment::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: var(--seam);
+  box-shadow: -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.neu-segment:hover {
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.neu-segment:active {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.70) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.neu-segment[data-active='true'] {
+  color: var(--text);
+  background: linear-gradient(180deg, var(--surface-selected-0), var(--surface-selected-1));
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.50) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+/* ─── Neumorphic: Buttons ─────────────────────── */
+
+.neu-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--r-field);
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.05) inset,
+    0 0 0 1px var(--stroke-soft) inset;
+  transition:
+    box-shadow var(--t-fast) var(--ease),
+    background var(--t-fast) var(--ease);
+}
+
+.neu-btn-primary:hover {
+  box-shadow:
+    0 14px 28px rgba(0, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 0 1px var(--stroke-strong) inset;
+}
+
+.neu-btn-primary:active {
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.70) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.04) inset;
+}
+
+.neu-btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.30),
+    0 0 0 1px var(--stroke-soft) inset;
+}
+
+.neu-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  padding: 0 20px;
+  border: none;
+  border-radius: var(--r-pill);
+  background: linear-gradient(180deg, rgba(42, 44, 45, 0.6), rgba(28, 29, 30, 0.6));
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px var(--stroke-soft) inset;
+  transition:
+    color var(--t-fast) var(--ease),
+    box-shadow var(--t-fast) var(--ease);
+}
+
+.neu-btn-secondary:hover {
+  color: var(--text);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 1px var(--stroke-strong) inset;
+}
+
+.neu-btn-secondary:active {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.60) inset,
+    0 -1px 0 rgba(255, 255, 255, 0.03) inset;
+}
+
+.neu-btn-secondary:disabled {
+  opacity: 0.40;
+  cursor: not-allowed;
+}
+
+/* ─── Labels ──────────────────────────────────── */
+
+.neu-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--text-muted);
+  line-height: 14px;
+}
+
+/* ─── Status indicator ────────────────────────── */
+
+.neu-status-active {
+  width: 44px;
+  height: 10px;
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  box-shadow: 0 0 16px var(--accent-glow);
+}
+
+.neu-status-inactive {
+  width: 24px;
+  height: 6px;
+  border-radius: var(--r-pill);
+  background: rgba(231, 234, 240, 0.18);
+}
+
+/* ─── Range slider styling ────────────────────── */
+
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: rgba(0, 0, 0, 0.40);
+  border-radius: var(--r-pill);
+  outline: none;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.50) inset;
+}
+
+input[type='range']::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.50),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  cursor: pointer;
+  border: none;
+}
+
+input[type='range']::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, var(--surface-0), var(--surface-1));
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.50),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
+  cursor: pointer;
+  border: none;
+}
+
+/* ─── Animations (preserved from original) ────── */
+
+@keyframes suma-correct-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
+    transform: translateZ(0);
+  }
+  35% {
+    box-shadow: 0 0 0 2px rgba(5, 192, 40, 0.45), 0 0 14px rgba(5, 192, 40, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(5, 192, 40, 0);
+  }
+}
+
+@keyframes suma-wrong-shake {
+  0% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
+  25% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(2px);
+    box-shadow: 0 0 0 2px rgba(248, 113, 113, 0.55), 0 0 18px rgba(248, 113, 113, 0.22);
+  }
+  75% {
+    transform: translateX(-2px);
+  }
+  100% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 rgba(248, 113, 113, 0);
+  }
+}
+
+.suma-feedback-correct {
+  animation: suma-correct-pulse 160ms ease-out;
+}
+
+.suma-feedback-wrong {
+  animation: suma-wrong-shake 170ms ease-out;
 }

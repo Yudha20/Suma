@@ -14,11 +14,11 @@ export function PhotoExplainDrawer({
   swatches: Swatch[];
 }) {
   return (
-    <section className="rounded-lg border border-consoleEdge bg-black/40 p-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-slate-300">How we got this number</p>
-      <div className="mt-3 flex flex-col gap-3 text-sm text-slate-300">
+    <section className="neu-capsule p-6">
+      <p className="neu-label">How we got this number</p>
+      <div className="mt-3 flex flex-col gap-3 text-sm text-text-muted">
         <p>
-          Status: <span className="font-medium text-slate-100">{status}</span>
+          Status: <span className="font-medium text-text">{status}</span>
         </p>
         {message ? <p>{message}</p> : null}
 
@@ -27,7 +27,7 @@ export function PhotoExplainDrawer({
             {candidates.map((candidate) => (
               <span
                 key={candidate}
-                className="rounded-md border border-emerald-500/40 bg-emerald-500/10 px-2 py-1 text-xs geist-mono text-emerald-200"
+                className="rounded-field border border-accent/35 bg-accent/10 px-2 py-1 text-xs geist-mono text-green-300"
               >
                 {candidate}
               </span>
@@ -38,7 +38,10 @@ export function PhotoExplainDrawer({
         {swatches.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {swatches.map((swatch, index) => (
-              <div key={`${swatch.hex}-${index}`} className="flex items-center gap-2 rounded-md border border-consoleEdge bg-black/30 px-2 py-1">
+              <div
+                key={`${swatch.hex}-${index}`}
+                className="neu-inset flex items-center gap-2 px-2 py-1"
+              >
                 <span
                   className="inline-block h-4 w-4 rounded-sm border border-black/40"
                   style={{ backgroundColor: swatch.hex }}
@@ -51,9 +54,12 @@ export function PhotoExplainDrawer({
         ) : null}
 
         {explainability.map((block, index) => (
-          <div key={`${block.title}-${index}`} className="rounded-md border border-consoleEdge bg-black/30 p-3">
-            <h3 className="text-xs uppercase tracking-[0.2em] text-slate-400">{block.title}</h3>
-            <div className="mt-2 flex flex-col gap-1 text-xs text-slate-300">
+          <div
+            key={`${block.title}-${index}`}
+            className="neu-inset p-3"
+          >
+            <h3 className="neu-label">{block.title}</h3>
+            <div className="mt-2 flex flex-col gap-1 text-xs text-text-muted">
               {block.lines.map((line, lineIndex) => (
                 <p key={`${block.title}-${lineIndex}`}>{line}</p>
               ))}

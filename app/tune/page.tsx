@@ -180,50 +180,56 @@ export default function TunePage() {
     <ConsoleShell>
       <ConsoleCard>
         <div className="flex flex-col gap-3">
-          <h1 className="text-lg font-semibold">Tune OCR</h1>
-          <p className="text-sm text-slate-400">
+          <h1 className="text-lg font-semibold text-text">Tune OCR</h1>
+          <p className="text-sm text-text-muted">
             Expected value is parsed from the final hyphen in filename. Example:{' '}
             <span className="geist-mono">Capture-2026-02-11-221241-2025.png</span>
           </p>
           {error ? <p className="text-sm text-rose-300">{error}</p> : null}
-          {isLoadingList ? <p className="text-sm text-slate-400">Loading tune manifest...</p> : null}
+          {isLoadingList ? <p className="text-sm text-text-muted">Loading tune manifest...</p> : null}
         </div>
       </ConsoleCard>
 
       <ConsoleCard>
         <div className="grid gap-3 sm:grid-cols-3">
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label className="flex flex-col gap-1 neu-label">
             Brightness
-            <input
-              type="number"
-              value={brightnessTweak}
-              min={-40}
-              max={40}
-              onChange={(event) => setBrightnessTweak(clampBrightnessTweak(Number(event.target.value)))}
-              className="rounded-md border border-consoleEdge bg-black/30 px-2 py-2 text-sm text-slate-100"
-            />
+            <div className="neu-inset">
+              <input
+                type="number"
+                value={brightnessTweak}
+                min={-40}
+                max={40}
+                onChange={(event) => setBrightnessTweak(clampBrightnessTweak(Number(event.target.value)))}
+                className="w-full rounded-field bg-transparent px-3 py-2 text-sm text-text outline-none"
+              />
+            </div>
           </label>
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label className="flex flex-col gap-1 neu-label">
             OCR timeout ms
-            <input
-              type="number"
-              value={ocrTimeoutMs}
-              min={1000}
-              step={100}
-              onChange={(event) => setOcrTimeoutMs(Math.max(1000, Math.round(Number(event.target.value))))}
-              className="rounded-md border border-consoleEdge bg-black/30 px-2 py-2 text-sm text-slate-100"
-            />
+            <div className="neu-inset">
+              <input
+                type="number"
+                value={ocrTimeoutMs}
+                min={1000}
+                step={100}
+                onChange={(event) => setOcrTimeoutMs(Math.max(1000, Math.round(Number(event.target.value))))}
+                className="w-full rounded-field bg-transparent px-3 py-2 text-sm text-text outline-none"
+              />
+            </div>
           </label>
-          <label className="flex flex-col gap-1 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label className="flex flex-col gap-1 neu-label">
             Palette timeout ms
-            <input
-              type="number"
-              value={paletteTimeoutMs}
-              min={300}
-              step={100}
-              onChange={(event) => setPaletteTimeoutMs(Math.max(300, Math.round(Number(event.target.value))))}
-              className="rounded-md border border-consoleEdge bg-black/30 px-2 py-2 text-sm text-slate-100"
-            />
+            <div className="neu-inset">
+              <input
+                type="number"
+                value={paletteTimeoutMs}
+                min={300}
+                step={100}
+                onChange={(event) => setPaletteTimeoutMs(Math.max(300, Math.round(Number(event.target.value))))}
+                className="w-full rounded-field bg-transparent px-3 py-2 text-sm text-text outline-none"
+              />
+            </div>
           </label>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -231,7 +237,7 @@ export default function TunePage() {
             type="button"
             onClick={runBenchmark}
             disabled={isRunning || items.length === 0}
-            className="h-10 rounded-lg border border-accent bg-emerald-500/20 px-4 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/30 disabled:cursor-not-allowed disabled:opacity-60"
+            className="neu-btn-primary"
           >
             {isRunning ? 'Running...' : 'Run Benchmark'}
           </button>
@@ -239,43 +245,45 @@ export default function TunePage() {
             type="button"
             onClick={exportCsv}
             disabled={results.length === 0}
-            className="h-10 rounded-lg border border-consoleEdge bg-black/40 px-4 text-sm text-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+            className="neu-btn-secondary disabled:opacity-40"
           >
             Export CSV
           </button>
           <button
             type="button"
             onClick={() => void loadManifest()}
-            className="h-10 rounded-lg border border-consoleEdge bg-black/40 px-4 text-sm text-slate-200"
+            className="neu-btn-secondary"
           >
             Refresh Files
           </button>
         </div>
-        <p className="mt-3 text-sm text-slate-400">
+        <p className="mt-3 text-sm text-text-muted">
           Progress: {progress}/{items.length}
         </p>
       </ConsoleCard>
 
       <ConsoleCard>
-        <div className="grid gap-2 text-sm sm:grid-cols-3">
-          <p>Total files: {summary.total}</p>
-          <p>Labelled files: {summary.labelled}</p>
-          <p>Ran files: {summary.ran}</p>
-          <p>Exact matches: {summary.exactMatches}</p>
-          <p>Labelled run count: {summary.ranLabelled}</p>
-          <p>Exact accuracy: {summary.accuracy.toFixed(1)}%</p>
+        <div className="grid gap-2 text-sm text-text-muted">
+          <div className="grid gap-2 sm:grid-cols-3">
+            <p>Total files: <span className="text-text geist-mono">{summary.total}</span></p>
+            <p>Labelled files: <span className="text-text geist-mono">{summary.labelled}</span></p>
+            <p>Ran files: <span className="text-text geist-mono">{summary.ran}</span></p>
+            <p>Exact matches: <span className="text-text geist-mono">{summary.exactMatches}</span></p>
+            <p>Labelled run count: <span className="text-text geist-mono">{summary.ranLabelled}</span></p>
+            <p>Exact accuracy: <span className="text-text geist-mono">{summary.accuracy.toFixed(1)}%</span></p>
+          </div>
         </div>
       </ConsoleCard>
 
       <ConsoleCard>
         <div className="flex flex-col gap-2">
-          <h2 className="text-base font-semibold">Mismatches ({mismatches.length})</h2>
+          <h2 className="text-base font-semibold text-text">Mismatches ({mismatches.length})</h2>
           {mismatches.length === 0 ? (
-            <p className="text-sm text-slate-400">No mismatches found in this run.</p>
+            <p className="text-sm text-text-muted">No mismatches found in this run.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full text-left text-sm">
-                <thead className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                <thead className="neu-label">
                   <tr>
                     <th className="px-2 py-2">File</th>
                     <th className="px-2 py-2">Expected</th>
@@ -285,9 +293,9 @@ export default function TunePage() {
                     <th className="px-2 py-2">ms</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="text-text-muted">
                   {mismatches.map((row) => (
-                    <tr key={row.file} className="border-t border-consoleEdge">
+                    <tr key={row.file} className="border-t border-stroke-soft">
                       <td className="px-2 py-2 geist-mono text-xs">{row.file}</td>
                       <td className="px-2 py-2 geist-mono">{row.expected}</td>
                       <td className="px-2 py-2 geist-mono">{row.detected || '-'}</td>

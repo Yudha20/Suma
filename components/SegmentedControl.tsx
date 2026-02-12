@@ -18,8 +18,8 @@ export function SegmentedControl<T extends string | number>({
 }) {
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-xs uppercase tracking-[0.2em] text-slate-400">{label}</span>
-      <div className="grid grid-cols-5 gap-2">
+      <span className="neu-label">{label}</span>
+      <div className="neu-segment-rail">
         {options.map((option) => {
           const active = option.value === value;
           return (
@@ -27,12 +27,8 @@ export function SegmentedControl<T extends string | number>({
               key={String(option.value)}
               type="button"
               onClick={() => onChange(option.value)}
-              className={
-                'h-10 rounded-lg border text-sm transition duration-150 ' +
-                (active
-                  ? 'border-accent bg-emerald-500/20 text-emerald-200 shadow-[0_0_10px_rgba(58,212,127,0.35)]'
-                  : 'border-consoleEdge bg-black/40 text-slate-300 hover:border-slate-500')
-              }
+              data-active={active}
+              className="neu-segment"
             >
               {option.label}
             </button>

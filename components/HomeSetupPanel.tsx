@@ -42,12 +42,12 @@ export function HomeSetupPanel({
         />
       </div>
 
-      <div className="rounded-lg border border-consoleEdge bg-black/30 p-4">
+      <div className="neu-inset p-4">
         <div className="flex items-center justify-between gap-3">
-          <label htmlFor="brightness" className="text-xs uppercase tracking-[0.2em] text-slate-400">
+          <label htmlFor="brightness" className="neu-label">
             Brightness tweak
           </label>
-          <span className="text-xs text-slate-300 geist-mono">{settings.brightnessTweak}</span>
+          <span className="text-xs text-text-muted geist-mono">{settings.brightnessTweak}</span>
         </div>
         <input
           id="brightness"
@@ -57,7 +57,7 @@ export function HomeSetupPanel({
           step={1}
           value={settings.brightnessTweak}
           onChange={(event) => onBrightnessChange(Number(event.target.value))}
-          className="mt-3 h-10 w-full"
+          className="mt-3 w-full"
         />
       </div>
     </>

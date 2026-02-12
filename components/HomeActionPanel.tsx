@@ -29,14 +29,15 @@ export function HomeActionPanel({
         <button
           type="button"
           onClick={() => onStart('sprint60')}
-          className="h-12 rounded-lg border border-accent bg-emerald-500/20 text-sm font-semibold text-emerald-200 transition hover:bg-emerald-500/30"
+          className="neu-btn-primary"
         >
           Start Sprint (60s)
         </button>
         <button
           type="button"
           onClick={() => onStart('session120')}
-          className="h-12 rounded-lg border border-consoleEdge bg-black/50 text-sm font-semibold text-slate-200 transition hover:border-slate-500"
+          className="neu-btn-primary"
+          style={{ opacity: 0.85 }}
         >
           Start Session (120s)
         </button>
@@ -46,14 +47,14 @@ export function HomeActionPanel({
         <button
           type="button"
           onClick={onSurprise}
-          className="h-10 rounded-full border border-consoleEdge px-4 text-xs uppercase tracking-[0.2em] text-slate-300 transition hover:border-slate-500"
+          className="neu-btn-secondary"
         >
           Surprise Me
         </button>
         <button
           type="button"
           onClick={onPhotoClick}
-          className="h-10 rounded-full border border-consoleEdge px-4 text-xs uppercase tracking-[0.2em] text-slate-300 transition hover:border-slate-500"
+          className="neu-btn-secondary"
         >
           Photo Mode
         </button>
@@ -61,10 +62,10 @@ export function HomeActionPanel({
 
       {isPhotoProcessing ? (
         <div className="space-y-2">
-          <div className="h-1 w-full overflow-hidden rounded-full bg-black/50">
-            <div className="h-full w-1/3 animate-pulse rounded-full bg-emerald-400" />
+          <div className="h-1 w-full overflow-hidden rounded-pill bg-surface1">
+            <div className="h-full w-1/3 animate-pulse rounded-pill bg-accent" />
           </div>
-          <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Scanning photo...</p>
+          <p className="neu-label">Scanning photo...</p>
         </div>
       ) : null}
 

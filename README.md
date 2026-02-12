@@ -95,6 +95,25 @@ Photo seed derivation uses this order:
 
 If OCR fails on large images, crop the numeric region tighter for better accuracy. The app will still return a seed via fallback so training is never blocked.
 
+### Local Tesseract traineddata
+
+Suma now expects local traineddata files served from `public/tessdata`:
+
+- `public/tessdata/eng.traineddata.gz` (fast default worker)
+- `public/tessdata/digits.traineddata.gz` (on-demand high-accuracy digits worker)
+
+Download and gzip:
+
+```bash
+mkdir -p public/tessdata
+curl -L "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata" -o public/tessdata/eng.traineddata
+gzip -9 -f public/tessdata/eng.traineddata
+curl -L "https://github.com/Shreeshrii/tessdata_shreetest/raw/master/digits.traineddata" -o public/tessdata/digits.traineddata
+gzip -9 -f public/tessdata/digits.traineddata
+```
+
+If you keep plain `.traineddata` files instead of `.gz`, set `gzip: false` in `lib/ocr/tesseractClient.ts`.
+
 ## OCR tuning benchmark
 
 Use `/tune` to batch-run OCR against images in `public/tune` and get exact-match accuracy.

@@ -90,7 +90,7 @@ export default function HomePage() {
             photoSwatches={photoSwatches}
             photoExplainability={photoExplainability}
           />
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-text-dim">
             Tip: press Cmd+V or Ctrl+V to paste an image and start scanning instantly.
           </p>
 

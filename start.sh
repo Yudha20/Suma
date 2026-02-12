@@ -17,5 +17,8 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
-(sleep 3 && open http://localhost:3000 >/dev/null 2>&1 || true) &
-npm run dev
+PORT="${PORT:-3002}"
+HOST="${HOST:-127.0.0.1}"
+
+(sleep 3 && open "http://${HOST}:${PORT}" >/dev/null 2>&1 || true) &
+npm run dev:reset -- --hostname "$HOST" --port "$PORT"

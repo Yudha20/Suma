@@ -19,7 +19,8 @@ export default function TrainPage() {
     handleExit,
     summary,
     showSummary,
-    currentFixIndex
+    currentFixIndex,
+    feedback
   } = useTrainController();
 
   useEffect(() => {
@@ -35,14 +36,14 @@ export default function TrainPage() {
   if (!session || !session.currentQuestion) {
     return (
       <ConsoleShell>
-        <ConsoleCard>
+        <ConsoleCard variant="flat">
           <div className="flex flex-col gap-3">
-            <h2 className="text-lg font-semibold">No active session</h2>
-            <p className="text-sm text-slate-400">Start a Sprint or Session from the home console.</p>
+            <h2 className="text-lg font-semibold text-text">No active session</h2>
+            <p className="text-sm text-text-muted">Start a Sprint or Session from the home console.</p>
             <button
               type="button"
               onClick={() => router.push('/')}
-              className="h-10 w-fit rounded-lg border border-consoleEdge px-4 text-sm text-slate-200"
+              className="neu-btn-secondary w-fit"
             >
               Back to Home
             </button>
@@ -60,20 +61,20 @@ export default function TrainPage() {
   return (
     <ConsoleShell>
       <div className="flex items-center justify-between">
-        <div className="text-sm uppercase tracking-[0.2em] text-slate-400">Train</div>
-        <div className="text-lg font-semibold text-slate-100 geist-mono">
+        <div className="neu-label">Train</div>
+        <div className="text-lg font-semibold text-text geist-mono">
           {minutes}:{seconds}
         </div>
       </div>
 
-      <ConsoleCard>
+      <ConsoleCard variant="flat">
         <div className="flex flex-col gap-5">
-          <div className="flex flex-wrap items-center justify-between gap-3 text-xs uppercase tracking-[0.2em] text-slate-400">
+          <div className="flex flex-wrap items-center justify-between gap-3 neu-label">
             <span>{session.mode === 'sprint60' ? 'Sprint 60s' : 'Session 120s'}</span>
             <span>Seed {session.seed}</span>
           </div>
           {session.fixTotal > 0 ? (
-            <div className="text-xs uppercase tracking-[0.2em] text-emerald-300">
+            <div className="neu-label text-text-muted">
               Fix My Misses{' '}
               <span className="geist-mono">
                 {Math.min(currentFixIndex, session.fixTotal)}/{session.fixTotal}
@@ -88,14 +89,15 @@ export default function TrainPage() {
             onChange={setAnswer}
             onSubmit={handleSubmit}
             disabled={showSummary}
+            feedback={feedback}
           />
 
-          <div className="flex items-center justify-between text-xs text-slate-400">
-            <span>Enter to submit</span>
+          <div className="flex items-center justify-between text-xs text-text-dim">
+            <span>Auto-submits after pause (Enter also works)</span>
             <button
               type="button"
               onClick={handleExit}
-              className="rounded-full border border-consoleEdge px-3 py-1 text-xs uppercase tracking-[0.2em]"
+              className="neu-btn-secondary"
             >
               Exit
             </button>
@@ -104,7 +106,7 @@ export default function TrainPage() {
       </ConsoleCard>
 
       {showSummary && summary ? (
-        <ConsoleCard>
+        <ConsoleCard variant="flat">
           <SessionSummary summary={summary} />
         </ConsoleCard>
       ) : null}

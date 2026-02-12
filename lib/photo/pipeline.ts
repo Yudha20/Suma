@@ -101,7 +101,7 @@ async function runPipeline(file: File, options: PhotoPipelineOptions): Promise<P
   const paletteSwatches = await palettePromise;
   const mapped = deriveSeedFromPalette(paletteSwatches, brightnessTweak, 8);
 
-  if (!/^\d{2,8}$/.test(mapped.seed)) {
+  if (!/^\d{2,10}$/.test(mapped.seed)) {
     throw new Error('Palette mapping did not produce a valid seed.');
   }
 
@@ -162,11 +162,12 @@ function buildPaletteMessage(seed: string, diagnostics: string[]): string {
 }
 
 function isUsableOcrCandidate(candidate: { digits: string; confidence: number }): boolean {
-  if (candidate.digits.length >= 3) {
+  if (candidate.digits.length >= 3 && candidate.digits.length <= 10) {
     return true;
   }
-  // Allow 2-digit outputs when OCR is confident; this helps true handwritten 2-digit samples.
-  if (candidate.digits.length === 2 && candidate.confidence >= 0.82) {
+  // Allow 2-digit outputs when OCR is confident; lowered threshold to help
+  // true handwritten 2-digit samples (e.g. "14", "33", "60" from tuning set).
+  if (candidate.digits.length === 2 && candidate.confidence >= 0.72) {
     return true;
   }
   return false;

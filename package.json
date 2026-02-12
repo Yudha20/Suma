@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
+    "dev:reset": "rm -rf .next && next dev",
+    "dev:3002": "rm -rf .next && next dev --hostname 127.0.0.1 --port 3002",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "timeline:sync": "node scripts/timeline_sync.mjs"
   },
   "dependencies": {
     "next": "^14.2.5",

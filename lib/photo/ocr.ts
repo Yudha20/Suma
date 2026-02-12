@@ -1,4 +1,5 @@
 import type { OcrCandidate } from '@/lib/photo/types';
+import { recognizeDigits } from '@/lib/ocr/tesseractClient';
 
 type TextBlock = {
   rawValue?: string;
@@ -9,48 +10,29 @@ type TextDetectorInstance = {
 };
 
 type TextDetectorConstructor = new () => TextDetectorInstance;
-type TesseractResult = {
-  data?: {
-    text?: string;
-    confidence?: number;
-  };
-};
-
-type TesseractLike = {
-  recognize: (
-    source: HTMLCanvasElement,
-    language: string,
-    options?: Record<string, unknown>
-  ) => Promise<TesseractResult>;
-};
-
-type GlobalWithOcr = typeof globalThis & {
-  TextDetector?: unknown;
-  Tesseract?: TesseractLike;
-  __sumaTesseractLoader?: Promise<TesseractLike>;
-};
-
-const TESSERACT_CDNS = [
-  'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js',
-  'https://unpkg.com/tesseract.js@5/dist/tesseract.min.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js'
-];
 
 const LOOKALIKE_DIGIT_MAP: Record<string, string> = {
   O: '0',
   o: '0',
   Q: '0',
   D: '0',
+  U: '0',
   I: '1',
   l: '1',
   '|': '1',
   '!': '1',
+  i: '1',
   Z: '2',
   z: '2',
+  E: '3',
+  A: '4',
   S: '5',
   s: '5',
   G: '6',
-  B: '8'
+  T: '7',
+  B: '8',
+  g: '9',
+  q: '9'
 };
 
 export type OcrRunResult = {
@@ -59,8 +41,7 @@ export type OcrRunResult = {
 };
 
 function getTextDetector(): TextDetectorConstructor | null {
-  const globalWithDetector = globalThis as GlobalWithOcr;
-  const detector = globalWithDetector.TextDetector;
+  const detector = (globalThis as typeof globalThis & { TextDetector?: unknown }).TextDetector;
   if (typeof detector !== 'function') {
     return null;
   }
@@ -158,7 +139,7 @@ export function pickBestOcrCandidate(candidates: OcrCandidate[]): OcrCandidate |
     return null;
   }
 
-  const valid = candidates.filter((candidate) => /^\d{2,8}$/.test(candidate.digits));
+  const valid = candidates.filter((candidate) => /^\d{2,10}$/.test(candidate.digits));
   if (valid.length === 0) {
     return null;
   }
@@ -180,24 +161,33 @@ export function pickBestOcrCandidate(candidates: OcrCandidate[]): OcrCandidate |
 export function extractDigitsFromText(text: string): string[] {
   const outputs = new Set<string>();
   const normalizedText = normalizeLikelyDigitRuns(text);
-  const compactMatches = text.match(/(?<!\d)\d{2,8}(?!\d)/g) ?? [];
+  const compactMatches = text.match(/(?<!\d)\d{2,10}(?!\d)/g) ?? [];
   for (const match of compactMatches) {
-    if (/^\d{2,8}$/.test(match)) {
+    if (/^\d{2,10}$/.test(match)) {
       outputs.add(match);
     }
   }
 
-  const noisyMatches = normalizedText.match(/(?<!\d)\d(?:[\s\-.,/|]{0,3}\d){1,7}(?!\d)/g) ?? [];
+  const noisyMatches = normalizedText.match(/(?<!\d)\d(?:[\s\-.,/|]{0,3}\d){1,9}(?!\d)/g) ?? [];
   for (const match of noisyMatches) {
     const normalized = match.replace(/\D/g, '');
-    if (/^\d{2,8}$/.test(normalized)) {
+    if (/^\d{2,10}$/.test(normalized)) {
       outputs.add(normalized);
+    }
+  }
+
+  // Handle alphanumeric codes like "NC0219" — strip common letter prefixes and extract digits.
+  const alphaNumericCodes = normalizedText.match(/[A-Za-z]{1,3}\d{2,10}/g) ?? [];
+  for (const code of alphaNumericCodes) {
+    const digitsOnly = code.replace(/[^0-9]/g, '');
+    if (/^\d{2,10}$/.test(digitsOnly)) {
+      outputs.add(digitsOnly);
     }
   }
 
   const tokenized = tokenizeDigitsWithIndices(normalizedText);
   for (const candidate of mergeNeighborDigitTokens(normalizedText, tokenized)) {
-    if (/^\d{2,8}$/.test(candidate)) {
+    if (/^\d{2,10}$/.test(candidate)) {
       outputs.add(candidate);
     }
   }
@@ -267,7 +257,7 @@ function mergeNeighborDigitTokens(text: string, tokens: DigitToken[]): string[] 
       value += tokens[end].value;
       addCandidateSlices(merged, value);
 
-      if (value.length >= 12) {
+      if (value.length >= 14) {
         break;
       }
     }
@@ -277,7 +267,7 @@ function mergeNeighborDigitTokens(text: string, tokens: DigitToken[]): string[] 
 }
 
 function addCandidateSlices(output: Set<string>, digits: string): void {
-  if (digits.length >= 2 && digits.length <= 8) {
+  if (digits.length >= 2 && digits.length <= 10) {
     output.add(digits);
   }
 }
@@ -302,7 +292,9 @@ function scoreCandidate(candidate: OcrCandidate): number {
     5: 0.92,
     6: 1,
     7: 0.95,
-    8: 0.85
+    8: 0.85,
+    9: 0.78,
+    10: 0.72
   };
   const lengthScore = lengthScoreByDigits[candidate.digits.length] ?? 0.4;
   const uniqueDigits = new Set(candidate.digits.split('')).size;
@@ -393,44 +385,72 @@ async function extractWithTesseract(
   canvas: HTMLCanvasElement,
   timeoutMs: number
 ): Promise<OcrCandidate[]> {
-  const tesseract = await loadTesseract();
   const variants = buildTesseractVariants(canvas, timeoutMs);
-  const perVariantTimeoutMs = Math.max(500, Math.floor(timeoutMs / Math.max(1, variants.length)));
+  const perFastTimeoutMs = Math.max(550, Math.floor(timeoutMs / Math.max(1, variants.length + 1)));
   const merged = new Map<string, OcrCandidate>();
 
   for (const variant of variants) {
-    const result = await withTimeout(
-      tesseract.recognize(variant.canvas, 'eng', {
-        tessedit_char_whitelist: '0123456789',
-        preserve_interword_spaces: '1',
-        tessedit_pageseg_mode: '6'
-      }),
-      perVariantTimeoutMs,
-      `Tesseract OCR timed out (${variant.label})`
-    ).catch(() => null);
+    const fast = await recognizeDigits(variant.canvas, {
+      mode: 'fast',
+      minLen: 2,
+      maxLen: 8,
+      timeoutMs: perFastTimeoutMs
+    }).catch(() => null);
 
-    if (!result) {
+    if (!fast?.digits) {
       continue;
     }
 
-    const text = result.data?.text ?? '';
-    const baseConfidence = Math.max(0.1, Math.min(0.99, (result.data?.confidence ?? 0) / 100));
-    const digits = extractDigitsFromText(text);
+    const normalizedConfidence = Math.max(0.12, Math.min(0.99, (fast.confidence ?? 45) / 100));
+    const candidate: OcrCandidate = {
+      digits: fast.digits,
+      confidence: Math.min(0.99, normalizedConfidence + fast.digits.length / 28 + variant.confidenceAdjust),
+      source: 'tesseract'
+    };
+    const previous = merged.get(candidate.digits);
+    if (!previous || candidate.confidence > previous.confidence) {
+      merged.set(candidate.digits, candidate);
+    }
+  }
 
-    for (const value of digits) {
+  // Slower, higher-accuracy digits model: run only on demand.
+  if (merged.size === 0 || !hasStrongCandidateFromMap(merged)) {
+    const perDigitsTimeoutMs = Math.max(900, Math.floor((timeoutMs * 1.35) / Math.max(1, variants.length + 1)));
+    for (const variant of variants) {
+      const digitsModel = await recognizeDigits(variant.canvas, {
+        mode: 'digits',
+        minLen: 2,
+        maxLen: 8,
+        timeoutMs: perDigitsTimeoutMs
+      }).catch(() => null);
+
+      if (!digitsModel?.digits) {
+        continue;
+      }
+
+      const normalizedConfidence = Math.max(0.2, Math.min(0.99, (digitsModel.confidence ?? 55) / 100));
       const candidate: OcrCandidate = {
-        digits: value,
-        confidence: Math.min(0.99, baseConfidence + value.length / 30 + variant.confidenceAdjust),
+        digits: digitsModel.digits,
+        confidence: Math.min(0.99, normalizedConfidence + digitsModel.digits.length / 24 + variant.confidenceAdjust + 0.05),
         source: 'tesseract'
       };
-      const previous = merged.get(value);
+      const previous = merged.get(candidate.digits);
       if (!previous || candidate.confidence > previous.confidence) {
-        merged.set(value, candidate);
+        merged.set(candidate.digits, candidate);
       }
     }
   }
 
   return Array.from(merged.values());
+}
+
+function hasStrongCandidateFromMap(candidates: Map<string, OcrCandidate>): boolean {
+  for (const candidate of candidates.values()) {
+    if (candidate.digits.length >= 4 && candidate.confidence >= 0.6) {
+      return true;
+    }
+  }
+  return false;
 }
 
 type TesseractVariant = {
@@ -512,6 +532,15 @@ function buildTextDetectorVariants(canvas: HTMLCanvasElement): TextDetectorVaria
       label: 'center-crop',
       canvas: centered,
       confidenceAdjust: 0.03
+    });
+  }
+  // Sharpened variant: apply unsharp mask to help with blurry stock photos.
+  const sharpened = sharpenCanvas(canvas);
+  if (sharpened !== canvas) {
+    variants.push({
+      label: 'sharpened',
+      canvas: sharpened,
+      confidenceAdjust: 0.02
     });
   }
   return variants;
@@ -734,6 +763,64 @@ function cropCanvas(source: HTMLCanvasElement, x: number, y: number, width: numb
   return cropped;
 }
 
+/**
+ * Apply a 3×3 sharpen convolution kernel to enhance blurry digit edges.
+ * Kernel: [0, -1, 0, -1, 5, -1, 0, -1, 0]
+ */
+function sharpenCanvas(source: HTMLCanvasElement): HTMLCanvasElement {
+  const { width, height } = source;
+  if (width < 8 || height < 8) return source;
+
+  const ctx = source.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return source;
+
+  const imageData = ctx.getImageData(0, 0, width, height);
+  const src = imageData.data;
+  const out = document.createElement('canvas');
+  out.width = width;
+  out.height = height;
+  const outCtx = out.getContext('2d', { willReadFrequently: true });
+  if (!outCtx) return source;
+
+  const result = outCtx.createImageData(width, height);
+  const dst = result.data;
+
+  // Sharpen kernel: center = 5, cardinal neighbours = -1
+  for (let y = 1; y < height - 1; y += 1) {
+    for (let x = 1; x < width - 1; x += 1) {
+      const idx = (y * width + x) * 4;
+      for (let c = 0; c < 3; c += 1) {
+        const val =
+          5 * src[idx + c]
+          - src[idx - width * 4 + c]  // up
+          - src[idx + width * 4 + c]  // down
+          - src[idx - 4 + c]          // left
+          - src[idx + 4 + c];         // right
+        dst[idx + c] = Math.max(0, Math.min(255, val));
+      }
+      dst[idx + 3] = src[idx + 3];
+    }
+  }
+  // Copy border pixels as-is.
+  for (let x = 0; x < width; x += 1) {
+    for (const y of [0, height - 1]) {
+      const idx = (y * width + x) * 4;
+      dst[idx] = src[idx]; dst[idx + 1] = src[idx + 1];
+      dst[idx + 2] = src[idx + 2]; dst[idx + 3] = src[idx + 3];
+    }
+  }
+  for (let y = 0; y < height; y += 1) {
+    for (const x of [0, width - 1]) {
+      const idx = (y * width + x) * 4;
+      dst[idx] = src[idx]; dst[idx + 1] = src[idx + 1];
+      dst[idx + 2] = src[idx + 2]; dst[idx + 3] = src[idx + 3];
+    }
+  }
+
+  outCtx.putImageData(result, 0, 0);
+  return out;
+}
+
 type GridRegion = {
   x: number;
   y: number;
@@ -818,78 +905,6 @@ function hasHighQualityCandidate(candidates: Map<string, OcrCandidate>): boolean
     }
   }
   return false;
-}
-
-async function loadTesseract(): Promise<TesseractLike> {
-  const globalWithOcr = globalThis as GlobalWithOcr;
-  if (globalWithOcr.Tesseract) {
-    return globalWithOcr.Tesseract;
-  }
-
-  if (globalWithOcr.__sumaTesseractLoader) {
-    return globalWithOcr.__sumaTesseractLoader;
-  }
-
-  globalWithOcr.__sumaTesseractLoader = loadTesseractFromAnyCdn(globalWithOcr);
-
-  try {
-    return await globalWithOcr.__sumaTesseractLoader;
-  } finally {
-    globalWithOcr.__sumaTesseractLoader = undefined;
-  }
-}
-
-async function loadTesseractFromAnyCdn(globalWithOcr: GlobalWithOcr): Promise<TesseractLike> {
-  let lastError: unknown = null;
-
-  for (const cdn of TESSERACT_CDNS) {
-    try {
-      const tesseract = await loadScriptAndGetTesseract(globalWithOcr, cdn);
-      return tesseract;
-    } catch (error: unknown) {
-      lastError = error;
-    }
-  }
-
-  throw new Error(`Failed to load Tesseract from all CDNs. Last error: ${stringifyError(lastError)}`);
-}
-
-async function loadScriptAndGetTesseract(
-  globalWithOcr: GlobalWithOcr,
-  source: string
-): Promise<TesseractLike> {
-  const existing = document.querySelector(`script[src="${source}"]`);
-  if (existing && globalWithOcr.Tesseract) {
-    return globalWithOcr.Tesseract;
-  }
-
-  await new Promise<void>((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = source;
-    script.async = true;
-    script.crossOrigin = 'anonymous';
-
-    const timeoutId = window.setTimeout(() => {
-      script.remove();
-      reject(new Error(`Timed out loading script: ${source}`));
-    }, 6000);
-
-    script.onload = () => {
-      window.clearTimeout(timeoutId);
-      resolve();
-    };
-    script.onerror = () => {
-      window.clearTimeout(timeoutId);
-      script.remove();
-      reject(new Error(`Script load failed: ${source}`));
-    };
-    document.head.appendChild(script);
-  });
-
-  if (globalWithOcr.Tesseract) {
-    return globalWithOcr.Tesseract;
-  }
-  throw new Error(`Script loaded but window.Tesseract was missing: ${source}`);
 }
 
 function formatError(engine: string, error: unknown): string {
