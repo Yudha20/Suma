@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-15 14:25:33 GMT+5:30 (+0530)
+Last updated: 2026-02-15 14:26:27 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,15 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-15 14:26:27 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`.
+- Codex thread activity: 4 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: assistant - `git push` failed due the pre-push hook. Key reason: - Hook ran timeline sync and detected `TIMELINE.md` changed/uncommitted, so it blocked push. Reported fi...
+- Engineering: assistant - I see additional local edits besides `TIMELINE.md`; I’ll only commit the timeline file now (as requested by the hook), then push and iterate once more if the...
 
 - **2026-02-15 14:25:33 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
