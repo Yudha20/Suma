@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-15 14:26:27 GMT+5:30 (+0530)
+Last updated: 2026-02-15 14:27:17 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,30 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-15 14:27:17 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 7 file(s) (4 UI/UX, 3 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`, `TIMELINE.md`.
+- Codex thread activity: 1 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - I checked the hook: it always runs `timeline:sync`, then blocks if `TIMELINE.md` changes. I’ll run a manual sync immediately before commit+push so the hook s...
+
+- **2026-02-15 14:27:08 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 7 file(s) (4 UI/UX, 3 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`, `TIMELINE.md`.
+- Codex thread activity: 1 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - I checked the hook: it always runs `timeline:sync`, then blocks if `TIMELINE.md` changes. I’ll run a manual sync immediately before commit+push so the hook s...
+
+- **2026-02-15 14:26:44 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`.
+- Codex thread activity: 1 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - The pre-push hook updated `TIMELINE.md` again. I’ll immediately do `add + commit + push` in one shot to minimize hook drift between steps.
 
 - **2026-02-15 14:26:27 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
@@ -265,6 +289,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 - `components/SegmentedControl.tsx`
 - `lib/hooks/useHomeController.ts`
 - `package.json`
+- `TIMELINE.md`
 
 ## How To Read This File
 
