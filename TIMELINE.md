@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-12 16:44:30 GMT+5:30 (+0530)
+Last updated: 2026-02-15 14:25:33 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,19 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-15 14:25:33 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`.
+- Codex thread activity: 84 new message(s) across 2 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Regression/Fix: assistant - The full production build is currently failing in this workspace for unrelated existing Next export/runtime issues, so I’m running a strict TypeScript check ...
+- Regression/Fix: assistant - Implemented. Segmented controls now trigger subtle haptic feedback on value change. What I changed: - Added a safe haptic helper using `navigator.vibrate(10)...
+- Regression/Fix: assistant - The screenshot shows a stale/corrupted `.next` server bundle state (`Cannot find module './948.js'`), not a haptics logic bug. I’m going to check which dev s...
+- Regression/Fix: assistant - Server is now cleanly up on `3002` with `predev:reset` check passing under Node 20. I’m doing a quick HTTP sanity check so we confirm it serves the app inste...
+- Regression/Fix: assistant - Port `3002` had no active listener despite stale connections, so new requests were failing. I’m launching the dev server in a persistent attached session on ...
 
 - **2026-02-12 16:44:30 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
@@ -237,7 +250,12 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- _(none)_
+- `app/page.tsx`
+- `components/HomeActionPanel.tsx`
+- `components/HomeSetupPanel.tsx`
+- `components/SegmentedControl.tsx`
+- `lib/hooks/useHomeController.ts`
+- `package.json`
 
 ## How To Read This File
 
