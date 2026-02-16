@@ -837,9 +837,17 @@ input[type='range']::-moz-range-thumb {
 
   .neu-segment-liquid-trail,
   .neu-segment-thumb,
-  .neu-segment-thumb-sheen {
-    transition: none;
-    animation: none;
+  .neu-segment-thumb-sheen,
+  .suma-feedback-correct,
+  .suma-feedback-wrong {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  .neu-segment-rail.is-pointer-held .neu-segment-thumb {
+    animation: none !important;
+    scale: 1 !important;
+    /* Keep it static if motion is reduced */
   }
 
   .neu-btn-primary,
