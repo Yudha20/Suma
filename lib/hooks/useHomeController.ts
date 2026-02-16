@@ -147,10 +147,6 @@ export function useHomeController() {
     setSettings({ tempo });
   };
 
-  const handleBrightnessChange = (brightnessTweak: number) => {
-    setSettings({ brightnessTweak });
-  };
-
   return {
     seedInput,
     setSeedInput: handleSeedChange,
@@ -164,7 +160,6 @@ export function useHomeController() {
     settings,
     handleDigitsChange,
     handleTempoChange,
-    handleBrightnessChange,
     photoStatus,
     photoMessage,
     photoCandidates,

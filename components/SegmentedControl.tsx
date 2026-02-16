@@ -27,6 +27,7 @@ export function SegmentedControl<T extends string | number>({
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const pointerRef = useRef<{ x: number; t: number } | null>(null);
+  const lastHapticAtRef = useRef(0);
   const downOriginRef = useRef<{ x: number; y: number } | null>(null);
   const [railWidth, setRailWidth] = useState(0);
   const [dragging, setDragging] = useState(false);
@@ -35,6 +36,7 @@ export function SegmentedControl<T extends string | number>({
   const [stretch, setStretch] = useState(0);
   const [pressed, setPressed] = useState(false);
   const [bouncing, setBouncing] = useState(false);
+  const [pointerHeld, setPointerHeld] = useState(false);
 
   const DRAG_THRESHOLD = 4;
 
@@ -127,6 +129,18 @@ export function SegmentedControl<T extends string | number>({
 
   /* ── Drag helpers ────────────────────────────── */
 
+  const triggerHaptic = (durationMs = 14) => {
+    if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') {
+      return;
+    }
+    const now = performance.now();
+    if (now - lastHapticAtRef.current < 55) {
+      return;
+    }
+    lastHapticAtRef.current = now;
+    navigator.vibrate(durationMs);
+  };
+
   const updateFromClientX = (clientX: number) => {
     const element = rootRef.current;
     if (!element || !segmentWidth) {
@@ -142,6 +156,7 @@ export function SegmentedControl<T extends string | number>({
     const nextIndex = Math.max(0, Math.min(Math.floor(contentX / segmentWidth), options.length - 1));
     const nextValue = options[nextIndex]?.value;
     if (nextValue !== undefined && nextValue !== value) {
+      triggerHaptic();
       onChange(nextValue);
     }
 
@@ -172,6 +187,7 @@ export function SegmentedControl<T extends string | number>({
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
     downOriginRef.current = { x: event.clientX, y: event.clientY };
     pointerRef.current = { x: event.clientX, t: performance.now() };
+    setPointerHeld(true);
   };
 
   const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
@@ -189,6 +205,7 @@ export function SegmentedControl<T extends string | number>({
       /* Crossed threshold — enter drag mode, capture pointer */
       event.currentTarget.setPointerCapture(event.pointerId);
       setDragging(true);
+      setPointerHeld(false); /* Release held visual when dragging begins */
       updateFromClientX(event.clientX);
       return;
     }
@@ -203,6 +220,7 @@ export function SegmentedControl<T extends string | number>({
     downOriginRef.current = null;
     pointerRef.current = null;
     setDragging(false);
+    setPointerHeld(false);
 
     if (wasDragging) {
       /* Was a real drag — snap back to nearest segment */
@@ -216,10 +234,12 @@ export function SegmentedControl<T extends string | number>({
       const tappedValue = options[tappedIndex]?.value;
       if (tappedValue !== undefined && tappedValue !== value) {
         setPressed(true);
+        triggerHaptic();
         onChange(tappedValue);
       } else if (tappedValue === value) {
         /* Re-tapped the already-active segment — elastic bounce */
         setBouncing(true);
+        triggerHaptic(14);
       }
     }
   };
@@ -231,7 +251,7 @@ export function SegmentedControl<T extends string | number>({
     dragging ? 'is-dragging' : '',
     settling ? 'is-settling' : '',
     pressed ? 'is-pressed' : '',
-
+    pointerHeld ? 'is-pointer-held' : '',
     bouncing ? 'is-bouncing' : ''
   ]
     .filter(Boolean)
@@ -250,6 +270,7 @@ export function SegmentedControl<T extends string | number>({
           downOriginRef.current = null;
           pointerRef.current = null;
           setDragging(false);
+          setPointerHeld(false);
         }}
         style={{ touchAction: 'none' }}
         role="radiogroup"
@@ -260,7 +281,7 @@ export function SegmentedControl<T extends string | number>({
           style={{
             width: segmentWidth,
             transform: `translateX(${thumbX}px) scaleX(${scaleX}) scaleY(${scaleY})`,
-            opacity: dragging ? 0.55 : 0
+            opacity: dragging ? 0.55 : pointerHeld ? 0.3 : 0
           }}
           aria-hidden="true"
         />

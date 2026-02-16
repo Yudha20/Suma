@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-15 14:27:31 GMT+5:30 (+0530)
+Last updated: 2026-02-16 21:08:06 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,21 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-16 21:09 GMT+5:30** (commit `feat: Segmented Control Press State`)
+  - **Segmented Control Interaction Enhancements:**
+    - Implemented **Sustained Press State** (`is-pointer-held`): The thumb visually depresses into the surface for as long as the pointer is held down.
+    - Added **Dynamic Pulse & Liquid Effects**: The thumb now "breathes" with a subtle scale/shadow pulse while held, and the liquid trail glow activates to enhance the tactile feel.
+    - Tuned physics for a smoother transition between raised and depressed states.
+
+- **2026-02-16 21:08:06 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 8 file(s) (5 UI/UX, 3 other).
+- UI/UX touched: `app/page.tsx`, `components/HomeActionPanel.tsx`, `components/HomeSetupPanel.tsx`, `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `lib/hooks/useHomeController.ts`, `package.json`, `README.md`.
+- Codex thread activity: 2 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- UI/UX: assistant - Done. I completed the full flow and pushed to `main`. - Committed `TIMELINE.md` as `870a106` (`Update timeline`) - Pushed successfully to `origin/main` (`012...
+- Engineering: assistant - The hook keeps self-triggering because each push attempt creates one new timeline message. I’m finalizing this by committing the latest timeline update and p...
 
 - **2026-02-15 14:27:31 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 6 file(s) (4 UI/UX, 2 other).
@@ -303,6 +318,8 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 - `components/SegmentedControl.tsx`
 - `lib/hooks/useHomeController.ts`
 - `package.json`
+- `README.md`
+- `styles/globals.css`
 
 ## How To Read This File
 

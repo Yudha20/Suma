@@ -59,6 +59,7 @@ Or use:
 ```bash
 ./start.sh
 ```
+source ~/.nvm/nvm.sh && nvm use && npm run dev -- --port 3002 --hostname 0.0.0.0
 
 Open `http://localhost:3000`.
 

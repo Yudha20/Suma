@@ -10,8 +10,7 @@ export function HomeSetupPanel({
   digitOptions,
   tempoOptions,
   onDigitsChange,
-  onTempoChange,
-  onBrightnessChange
+  onTempoChange
 }: {
   seedInput: string;
   surpriseNote: string | null;
@@ -21,7 +20,6 @@ export function HomeSetupPanel({
   tempoOptions: Tempo[];
   onDigitsChange: (digitsMax: Settings['digitsMax']) => void;
   onTempoChange: (tempo: Tempo) => void;
-  onBrightnessChange: (brightnessTweak: number) => void;
 }) {
   return (
     <>
@@ -39,25 +37,6 @@ export function HomeSetupPanel({
           options={tempoOptions.map((value) => ({ value, label: value }))}
           value={settings.tempo}
           onChange={onTempoChange}
-        />
-      </div>
-
-      <div className="neu-inset p-4">
-        <div className="flex items-center justify-between gap-3">
-          <label htmlFor="brightness" className="neu-label">
-            Brightness tweak
-          </label>
-          <span className="text-xs text-text-muted geist-mono">{settings.brightnessTweak}</span>
-        </div>
-        <input
-          id="brightness"
-          type="range"
-          min={-40}
-          max={40}
-          step={1}
-          value={settings.brightnessTweak}
-          onChange={(event) => onBrightnessChange(Number(event.target.value))}
-          className="mt-3 w-full"
         />
       </div>
     </>

@@ -25,7 +25,6 @@ export default function HomePage() {
     settings,
     handleDigitsChange,
     handleTempoChange,
-    handleBrightnessChange,
     photoStatus,
     photoMessage,
     photoCandidates,
@@ -80,7 +79,6 @@ export default function HomePage() {
               tempoOptions={tempoOptions}
               onDigitsChange={handleDigitsChange}
               onTempoChange={handleTempoChange}
-              onBrightnessChange={handleBrightnessChange}
             />
 
             <HomeActionPanel
