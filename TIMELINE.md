@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-17 10:13:35 GMT+5:30 (+0530)
+Last updated: 2026-02-17 10:56:01 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,17 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-17 10:56:01 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 16 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- UI/UX: assistant - Yes, there are local unpushed changes, but they are not committed yet: - `/Users/yudha/Downloads/Suma/TIMELINE.md` - `/Users/yudha/Downloads/Suma/components/...
+- Engineering: user - https://huggingface.co/deepseek-ai/DeepSeek-OCR-2. can we implement this OCR model in our overall idea, or do you think this will actually be beyond the scop...
+- Engineering: assistant - Yes. Best lightweight options for your current project are: - `Tesseract.js` (what you already use): lightest integration for browser/mobile web, no backend ...
+- Engineering: assistant - For your current app, you have 2 paths: - Stay with `tesseract.js` (current): no backend needed, no mandatory payment. - Move to a lightweight server OCR (li...
+- Engineering: user - any changes ot push?
 
 - **2026-02-17 10:13:35 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 1 file(s) (1 UI/UX, 0 other).
@@ -322,7 +333,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- `components/SegmentedControl.tsx`
+- _(none)_
 
 ## How To Read This File
 
