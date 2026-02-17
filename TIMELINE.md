@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-17 10:56:01 GMT+5:30 (+0530)
+Last updated: 2026-02-17 13:57:24 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,25 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-17 13:57:24 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 1 file(s) (0 UI/UX, 1 other).
+- Other engineering changes: `TIMELINE.md`.
+- Codex thread activity: 16 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Decision: assistant - I’ve identified several likely documentation drifts already (especially around Fix flow, storage keys, OCR limits/timeouts). I’m running the test suite once ...
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Fix: assistant - I’m now checking the actual training/state logic and design tokens to see if docs overstate features (for example help ladder, Fix behavior, or specific UI s...
+- Fix: assistant - Not all Markdown docs are up to date with the current code. **Status by file** - `/Users/yudha/Downloads/Suma/README.md` is partially stale. - `/Users/yudha/...
+- UI/UX: user - Can we check if all the md files are up to date or not, depending on all the changes that we have done so far? Can we check all the architecture, coding stan...
+- UI/UX: assistant - I’ll audit the repository docs against the current codebase and recent changes, then report which Markdown files are current vs stale across architecture, co...
+
+- **2026-02-17 12:13:45 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 2 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Engineering: assistant - The pre-push hook regenerated `TIMELINE.md` again from new thread activity. I’ll commit that update and push with `--no-verify` to avoid the hook loop and ge...
+- Engineering: assistant - Pushed. - Committed your haptic/segment update: `1f52024` (`Tune segmented haptic timing`) - Hook updated timeline again, so I committed that too: `c5eaa97` ...
 
 - **2026-02-17 10:56:01 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
@@ -333,7 +352,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- _(none)_
+- `TIMELINE.md`
 
 ## How To Read This File
 
