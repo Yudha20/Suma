@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-22 20:43:22 GMT+5:30 (+0530)
+Last updated: 2026-02-22 20:56:33 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,16 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-02-22 20:56:33 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 0 file(s) (0 UI/UX, 0 other).
+- Codex thread activity: 9 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Decision: assistant - Not pristine, but it’s in good shape. The structure is clean and testable, but there are a few real debts and inconsistencies that will bite later unless you...
+- Regression/Fix: user - # AGENTS.md instructions for /Users/yudha/Downloads/Suma <INSTRUCTIONS> ## Skills A skill is a set of local instructions to follow that is stored in a `SKILL...
+- Fix: user - Warning: apply_patch was requested via exec_command. Use the apply_patch tool instead of exec_command.
+- Fix: assistant - Refactor pass complete. I added a reachable Fix flow, wired hint/reveal behavior, and centralized metrics storage. There are also unrelated local changes in ...
+- Engineering: user - what do u think of the codebase, atm? is it pristine, or needs some refactoring?
 
 - **2026-02-22 20:43:22 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 3 file(s) (1 UI/UX, 2 other).
@@ -372,9 +382,7 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 
 ## Current Pending Local Changes (Not Yet Committed)
 
-- `package.json`
-- `styles/globals.css`
-- `TIMELINE.md`
+- _(none)_
 
 ## How To Read This File
 
