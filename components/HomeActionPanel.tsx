@@ -5,6 +5,8 @@ import type { SessionMode } from '@/lib/types';
 
 export function HomeActionPanel({
   onStart,
+  onFix,
+  fixCount,
   onSurprise,
   onPhotoClick,
   isPhotoProcessing,
@@ -15,6 +17,8 @@ export function HomeActionPanel({
   photoExplainability
 }: {
   onStart: (mode: SessionMode) => void;
+  onFix: () => void;
+  fixCount: number;
   onSurprise: () => void;
   onPhotoClick: () => void;
   isPhotoProcessing: boolean;
@@ -48,6 +52,14 @@ export function HomeActionPanel({
     onSurprise();
   };
 
+  const handleFix = () => {
+    if (fixCount <= 0) {
+      return;
+    }
+    triggerHaptic();
+    onFix();
+  };
+
   const handlePhotoClick = () => {
     triggerHaptic();
     onPhotoClick();
@@ -73,6 +85,14 @@ export function HomeActionPanel({
       </div>
 
       <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={handleFix}
+          disabled={fixCount <= 0}
+          className="neu-btn-secondary neu-btn-float-only disabled:opacity-50"
+        >
+          Fix My Misses{fixCount > 0 ? ` (${fixCount})` : ''}
+        </button>
         <button
           type="button"
           onClick={handleSurprise}

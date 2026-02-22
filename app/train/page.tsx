@@ -7,6 +7,7 @@ import { ConsoleCard } from '@/components/ConsoleCard';
 import { PromptDisplay } from '@/components/PromptDisplay';
 import { AnswerInput } from '@/components/AnswerInput';
 import { SessionSummary } from '@/components/SessionSummary';
+import { HelpControls } from '@/components/HelpControls';
 import { useTrainController } from '@/lib/hooks/useTrainController';
 
 export default function TrainPage() {
@@ -20,7 +21,13 @@ export default function TrainPage() {
     summary,
     showSummary,
     currentFixIndex,
-    feedback
+    feedback,
+    hintUsed,
+    revealsUsed,
+    maxReveals,
+    revealedAnswer,
+    handleHint,
+    handleReveal
   } = useTrainController();
 
   useEffect(() => {
@@ -58,6 +65,15 @@ export default function TrainPage() {
     .toString()
     .padStart(2, '0');
 
+  const modeLabel =
+    session.mode === 'sprint60'
+      ? 'Sprint 60s'
+      : session.mode === 'session120'
+        ? 'Session 120s'
+        : 'Fix My Misses';
+
+  const answerDigits = Math.abs(session.currentQuestion.answer).toString().length;
+
   return (
     <ConsoleShell>
       <div className="flex items-center justify-between">
@@ -70,7 +86,7 @@ export default function TrainPage() {
       <ConsoleCard variant="flat">
         <div className="flex flex-col gap-5">
           <div className="flex flex-wrap items-center justify-between gap-3 neu-label">
-            <span>{session.mode === 'sprint60' ? 'Sprint 60s' : 'Session 120s'}</span>
+            <span>{modeLabel}</span>
             <span>Seed {session.seed}</span>
           </div>
           {session.fixTotal > 0 ? (
@@ -83,6 +99,16 @@ export default function TrainPage() {
           ) : null}
 
           <PromptDisplay prompt={session.currentQuestion.prompt} />
+          {hintUsed ? (
+            <div className="text-xs text-text-muted">
+              Hint: answer has {answerDigits} digit{answerDigits === 1 ? '' : 's'}.
+            </div>
+          ) : null}
+          {revealedAnswer ? (
+            <div className="text-xs text-text geist-mono">
+              Answer: {revealedAnswer}
+            </div>
+          ) : null}
 
           <AnswerInput
             value={answer}
@@ -90,6 +116,15 @@ export default function TrainPage() {
             onSubmit={handleSubmit}
             disabled={showSummary}
             feedback={feedback}
+          />
+
+          <HelpControls
+            onHint={handleHint}
+            onReveal={handleReveal}
+            hintUsed={hintUsed}
+            revealsUsed={revealsUsed}
+            maxReveals={maxReveals}
+            disabled={showSummary}
           />
 
           <div className="flex items-center justify-between text-xs text-text-dim">

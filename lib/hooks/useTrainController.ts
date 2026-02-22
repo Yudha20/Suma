@@ -6,8 +6,24 @@ import { useAppStore } from '@/lib/state/store';
 import { getSessionDurationMs, isFixQuestion } from '@/lib/session/engine';
 import { getSummary } from '@/lib/session/scoring';
 import { logEvent } from '@/lib/metrics/logger';
+import type { SessionMode } from '@/lib/types';
 
 type AnswerFeedback = 'idle' | 'correct' | 'wrong';
+
+function getMaxReveals(mode: SessionMode): number | null {
+  switch (mode) {
+    case 'sprint60':
+      return 2;
+    case 'session120':
+      return 4;
+    case 'fix':
+      return null;
+    default: {
+      const exhaustive: never = mode;
+      return exhaustive;
+    }
+  }
+}
 
 export function useTrainController() {
   const router = useRouter();
@@ -23,8 +39,12 @@ export function useTrainController() {
   const [answer, setAnswer] = useState('');
   const [summaryVisible, setSummaryVisible] = useState(false);
   const [feedback, setFeedback] = useState<AnswerFeedback>('idle');
+  const [hintUsed, setHintUsed] = useState(false);
+  const [revealsUsed, setRevealsUsed] = useState(0);
+  const [revealedAnswer, setRevealedAnswer] = useState<string | null>(null);
   const autoSubmitTimerRef = useRef<number | null>(null);
   const feedbackTimerRef = useRef<number | null>(null);
+  const revealTimerRef = useRef<number | null>(null);
   const isSubmittingRef = useRef(false);
 
   useEffect(() => {
@@ -55,14 +75,25 @@ export function useTrainController() {
   }, [session?.mode, session?.startTs, updateTimeLeft]);
 
   useEffect(() => {
+    if (session) {
+      setRevealsUsed(0);
+      setHintUsed(false);
+      setRevealedAnswer(null);
+      setSummaryVisible(false);
+    }
+  }, [session?.startTs]);
+
+  useEffect(() => {
     setAnswer('');
     setFeedback('idle');
+    setHintUsed(false);
+    setRevealedAnswer(null);
     if (session?.currentQuestion) {
       logEvent('question_shown', { moveId: session.currentQuestion.moveId });
     }
   }, [session?.currentQuestion?.id]);
 
-  const submitAnswer = (value: string) => {
+  const submitAnswer = (value: string, flags?: { hintUsed?: boolean; isAssisted?: boolean }) => {
     if (!session || !session.currentQuestion) {
       return;
     }
@@ -81,6 +112,8 @@ export function useTrainController() {
     const parsed = Number(trimmed);
     const isValid = Number.isFinite(parsed);
     const isCorrect = normalized !== 'idk' && isValid && parsed === expected;
+    const hintFlag = flags?.hintUsed ?? hintUsed;
+    const assistedFlag = flags?.isAssisted ?? revealedAnswer !== null;
 
     setFeedback(isCorrect ? 'correct' : 'wrong');
     logEvent('answer_submitted', { moveId });
@@ -88,12 +121,16 @@ export function useTrainController() {
     // Keep feedback visible briefly, then advance by recording the attempt.
     window.clearTimeout(feedbackTimerRef.current ?? undefined);
     feedbackTimerRef.current = window.setTimeout(() => {
-      const attempt = answerCurrent(value, false, false);
+      const attempt = answerCurrent(value, hintFlag, assistedFlag);
       if (attempt) {
         logEvent(attempt.isCorrect ? 'answer_correct' : 'answer_incorrect', { moveId: attempt.moveId });
+        if (assistedFlag) {
+          logEvent('answer_assisted', { moveId: attempt.moveId });
+        }
       }
       setAnswer('');
       setFeedback('idle');
+      setRevealedAnswer(null);
       isSubmittingRef.current = false;
     }, 140);
   };
@@ -103,6 +140,9 @@ export function useTrainController() {
   };
 
   const handleAnswerChange = (value: string) => {
+    window.clearTimeout(revealTimerRef.current ?? undefined);
+    revealTimerRef.current = null;
+
     setAnswer(value);
     setFeedback('idle');
 
@@ -143,12 +183,52 @@ export function useTrainController() {
     return () => {
       window.clearTimeout(autoSubmitTimerRef.current ?? undefined);
       window.clearTimeout(feedbackTimerRef.current ?? undefined);
+      window.clearTimeout(revealTimerRef.current ?? undefined);
     };
   }, []);
 
   const handleExit = () => {
     endSession();
     router.push('/');
+  };
+
+  const handleHint = () => {
+    if (!session?.currentQuestion || hintUsed || summaryVisible) {
+      return;
+    }
+    setHintUsed(true);
+    logEvent('hint_used', { moveId: session.currentQuestion.moveId });
+  };
+
+  const handleReveal = () => {
+    if (!session?.currentQuestion || summaryVisible) {
+      return;
+    }
+    const maxReveals = getMaxReveals(session.mode);
+    if (maxReveals !== null && revealsUsed >= maxReveals) {
+      return;
+    }
+    if (isSubmittingRef.current) {
+      return;
+    }
+
+    if (!hintUsed) {
+      setHintUsed(true);
+      logEvent('hint_used', { moveId: session.currentQuestion.moveId });
+    }
+
+    const answerString = String(session.currentQuestion.answer);
+    setRevealsUsed((prev) => prev + 1);
+    setRevealedAnswer(answerString);
+    setAnswer(answerString);
+    logEvent('reveal_used', { moveId: session.currentQuestion.moveId });
+
+    window.clearTimeout(autoSubmitTimerRef.current ?? undefined);
+    window.clearTimeout(feedbackTimerRef.current ?? undefined);
+    window.clearTimeout(revealTimerRef.current ?? undefined);
+    revealTimerRef.current = window.setTimeout(() => {
+      submitAnswer(answerString, { hintUsed: true, isAssisted: true });
+    }, 450);
   };
 
   const summary = useMemo(() => {
@@ -162,6 +242,7 @@ export function useTrainController() {
   const currentFixIndex = session && session.currentQuestion && isFixQuestion(session.currentQuestion)
     ? session.fixAnswered + 1
     : session?.fixAnswered ?? 0;
+  const maxReveals = session ? getMaxReveals(session.mode) : null;
 
   return {
     session,
@@ -169,9 +250,15 @@ export function useTrainController() {
     setAnswer: handleAnswerChange,
     handleSubmit,
     handleExit,
+    handleHint,
+    handleReveal,
     summary,
     showSummary,
     currentFixIndex,
-    feedback
+    feedback,
+    hintUsed,
+    revealsUsed,
+    maxReveals,
+    revealedAnswer
   } as const;
 }

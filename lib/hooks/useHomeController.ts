@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppStore } from '@/lib/state/store';
-import { generateWeightedSeed, sanitizeSeed } from '@/lib/session/engine';
+import { buildFixQueue, generateWeightedSeed, sanitizeSeed } from '@/lib/session/engine';
 import { logEvent } from '@/lib/metrics/logger';
 import { processPhotoForSeed } from '@/lib/photo/pipeline';
 import type { ExplainBlock, PhotoStatus, Swatch } from '@/lib/photo/types';
@@ -20,7 +20,7 @@ const surpriseNotes = [
 
 export function useHomeController() {
   const router = useRouter();
-  const { settings, setSettings, startSession, hydrate, hydrated } = useAppStore();
+  const { settings, setSettings, startSession, hydrate, hydrated, attempts } = useAppStore();
 
   const [seedInput, setSeedInput] = useState('');
   const [surpriseNote, setSurpriseNote] = useState<string | null>(null);
@@ -38,6 +38,9 @@ export function useHomeController() {
     }
   }, [hydrated, hydrate]);
 
+  const fixQueue = buildFixQueue(attempts, 'fix');
+  const fixCount = fixQueue.length;
+
   const start = (mode: SessionMode, seed: string, seedSource: SeedSource) => {
     logEvent('seed_source_selected', { seedSource });
     logEvent('session_started', { mode });
@@ -54,6 +57,14 @@ export function useHomeController() {
     }
     const seed = generateWeightedSeed();
     start(mode, seed, 'auto');
+  };
+
+  const handleFix = () => {
+    if (fixCount === 0) {
+      return;
+    }
+    const seed = generateWeightedSeed();
+    start('fix', seed, 'auto');
   };
 
   const handleSurprise = () => {
@@ -152,6 +163,7 @@ export function useHomeController() {
     setSeedInput: handleSeedChange,
     surpriseNote,
     handleStart,
+    handleFix,
     handleSurprise,
     handlePhotoFile,
     handleClipboardPaste,
@@ -160,6 +172,7 @@ export function useHomeController() {
     settings,
     handleDigitsChange,
     handleTempoChange,
+    fixCount,
     photoStatus,
     photoMessage,
     photoCandidates,

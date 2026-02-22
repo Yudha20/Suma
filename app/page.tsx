@@ -17,6 +17,7 @@ export default function HomePage() {
     setSeedInput,
     surpriseNote,
     handleStart,
+    handleFix,
     handleSurprise,
     handlePhotoFile,
     handleClipboardPaste,
@@ -25,6 +26,7 @@ export default function HomePage() {
     settings,
     handleDigitsChange,
     handleTempoChange,
+    fixCount,
     photoStatus,
     photoMessage,
     photoCandidates,
@@ -83,6 +85,8 @@ export default function HomePage() {
 
             <HomeActionPanel
               onStart={handleStart}
+              onFix={handleFix}
+              fixCount={fixCount}
               onSurprise={handleSurprise}
               onPhotoClick={() => fileInputRef.current?.click()}
               isPhotoProcessing={isPhotoProcessing}

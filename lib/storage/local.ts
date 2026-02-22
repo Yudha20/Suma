@@ -1,9 +1,17 @@
 import type { Attempt, Settings } from '@/lib/types';
+import type { EventName, EventPayload } from '@/lib/metrics/events';
 import { getDefaultSettings } from '@/lib/state/defaults';
 import { migrateSettings, migrateAttempts } from '@/lib/storage/migrate';
 
 const SETTINGS_KEY = 'miw.settings.v1';
 const ATTEMPTS_KEY = 'miw.attempts.v1';
+const EVENTS_KEY = 'miw.events.v1';
+
+export type StoredEvent = {
+  name: EventName;
+  ts: number;
+  payload: EventPayload;
+};
 
 let settingsWriteTimeout: number | undefined;
 let attemptsWriteTimeout: number | undefined;
@@ -53,6 +61,36 @@ export function loadAttempts(): Attempt[] {
   } catch (error) {
     console.warn('Failed to load attempts', error);
     return [];
+  }
+}
+
+export function loadEvents(): StoredEvent[] {
+  if (typeof window === 'undefined') {
+    return [];
+  }
+  try {
+    const raw = window.localStorage.getItem(EVENTS_KEY);
+    if (!raw) {
+      return [];
+    }
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? (parsed as StoredEvent[]) : [];
+  } catch (error) {
+    console.warn('Failed to load events', error);
+    return [];
+  }
+}
+
+export function appendEvent(name: EventName, payload: EventPayload = {}): void {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  try {
+    const events = loadEvents();
+    events.unshift({ name, ts: Date.now(), payload });
+    window.localStorage.setItem(EVENTS_KEY, JSON.stringify(events.slice(0, 200)));
+  } catch (error) {
+    console.warn('Failed to log event', error);
   }
 }
 

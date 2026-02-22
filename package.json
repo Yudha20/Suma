@@ -4,9 +4,6 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "predev": "node scripts/check-node-version.mjs",
-    "predev:reset": "node scripts/check-node-version.mjs",
-    "predev:3002": "node scripts/check-node-version.mjs",
     "dev": "next dev",
     "dev:reset": "rm -rf .next && next dev",
     "dev:3002": "rm -rf .next && next dev --hostname 127.0.0.1 --port 3002",
