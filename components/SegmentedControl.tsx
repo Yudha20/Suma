@@ -47,8 +47,8 @@ export function SegmentedControl<T extends string | number>({
 
   const trackWidth = Math.max(0, railWidth - 8);
   const segmentWidth = options.length > 0 ? trackWidth / options.length : 0;
-  const scaleX = 1 + stretch * 0.14;
-  const scaleY = 1 - stretch * 0.06;
+  const scaleX = 1 + stretch * 0.1;
+  const scaleY = 1 - stretch * 0.04;
   const isMeasured = railWidth > 0;
 
   /* ── Measure rail ────────────────────────────── */
@@ -278,23 +278,12 @@ export function SegmentedControl<T extends string | number>({
         aria-label={label}
       >
         <div
-          className="neu-segment-liquid-trail"
-          style={{
-            width: isMeasured ? segmentWidth : `calc((100% - 8px) / ${options.length})`,
-            transform: isMeasured
-              ? `translateX(${thumbX}px) scaleX(${scaleX}) scaleY(${scaleY})`
-              : `translateX(calc(${activeIndex} * 100%))`,
-            opacity: dragging ? 0.55 : pointerHeld ? 0.3 : 0
-          }}
-          aria-hidden="true"
-        />
-        <div
           className="neu-segment-thumb"
           style={{
             width: isMeasured ? segmentWidth : `calc((100% - 8px) / ${options.length})`,
             transform: isMeasured
               ? `translateX(${thumbX}px) scaleX(${scaleX}) scaleY(${scaleY})`
-              : `translateX(calc(${activeIndex} * 100%))`
+              : `translateX(${activeIndex * 100}%)`
           }}
           aria-hidden="true"
         >

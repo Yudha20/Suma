@@ -1,6 +1,6 @@
 # Suma Timeline
 
-Last updated: 2026-02-23 22:12:09 GMT+5:30 (+0530)
+Last updated: 2026-05-04 19:17:18 GMT+5:30 (+0530)
 
 ## Simple Summary
 
@@ -9,6 +9,28 @@ Main progress so far: app scaffold + train loop + storage + OCR/photo seed pipel
 Current active work (not committed yet): OCR reliability improvements, tuning dataset setup, and **dark neumorphic UI system**.
 
 ## Timeline (Date/Time + What Happened)
+
+- **2026-05-04 19:17:18 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 6 file(s) (2 UI/UX, 4 other).
+- UI/UX touched: `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `.vscode/settings.json`, `package.json`, `scripts/local_ip.mjs`, `TIMELINE.md`.
+- Codex thread activity: 5 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Regression/Fix: assistant - `git push` failed. The pre-push hook ran timeline sync and modified [TIMELINE.md](/Users/yudha/Downloads/Suma/TIMELINE.md), then blocked the push. Current st...
+- Engineering: assistant - The push was blocked by the repo’s pre-push hook because it ran timeline sync and modified `TIMELINE.md`. I’m checking the status now so I can tell exactly w...
+
+- **2026-05-04 19:16:13 GMT+5:30 (+0530)** (automated local scan)
+- Local workspace changes: 5 file(s) (2 UI/UX, 3 other).
+- UI/UX touched: `components/SegmentedControl.tsx`, `styles/globals.css`.
+- Other engineering changes: `.vscode/settings.json`, `package.json`, `scripts/local_ip.mjs`.
+- Codex thread activity: 54 new message(s) across 1 workspace thread(s).
+- Key thread updates:
+- Fix: assistant - I’ll trace where that segmented control lives first, then I’ll patch the UI in the same style and spin the app up locally so you can poke it right away.
+- Fix: assistant - I found the segmented control already has drag, held, bounce, and a `neu-segment-liquid-trail` element. I’m going to inspect that component and its CSS now; ...
+- Fix: assistant - The page is serving. I also spotted an older fallback transform that rendered as `calc(2 * 100%)`, which CSS does not actually accept; hydration usually hide...
+- Fix: assistant - Current working-tree changes from this chat are in two files: [components/SegmentedControl.tsx](/Users/yudha/Downloads/Suma/components/SegmentedControl.tsx) ...
+- UI/UX: assistant - The component is close, but the “trail” is just a blurred copy of the thumb following the same position. I’m going to make it behave like an actual action tr...
+- UI/UX: assistant - The UI wiring is all in one component, which is nice. I’m editing `components/SegmentedControl.tsx` plus the control CSS only, and I’ll leave the existing di...
 
 - **2026-02-23 22:12:09 GMT+5:30 (+0530)** (automated local scan)
 - Local workspace changes: 3 file(s) (0 UI/UX, 3 other).
@@ -395,8 +417,11 @@ Current active work (not committed yet): OCR reliability improvements, tuning da
 ## Current Pending Local Changes (Not Yet Committed)
 
 - `.vscode/settings.json`
+- `components/SegmentedControl.tsx`
 - `package.json`
 - `scripts/local_ip.mjs`
+- `styles/globals.css`
+- `TIMELINE.md`
 
 ## How To Read This File
 
